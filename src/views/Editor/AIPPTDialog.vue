@@ -61,7 +61,7 @@
                         :options="[
             { label: 'Doubao-1.5-Pro', value: 'doubao-1.5-pro-32k' },
             { label: 'DeepSeek-v3', value: 'ark-deepseek-v3' },
-            { label: 'GLM-4-Flash', value: 'GLM-4-flash' },
+            { label: 'GLM-4-Flash', value: 'GLM-4-flash' }
           ]"
                 />
             </div>
@@ -127,8 +127,10 @@ import {ref, onMounted} from 'vue'
 import {storeToRefs} from 'pinia'
 import api from '@/services'
 import useAIPPT from '@/hooks/useAIPPT'
-import type {AIPPTSlide} from '@/types/AIPPT'
-import type {Slide} from '@/types/slides'
+
+import type { AIPPTSlide } from '@/types/AIPPT'
+import type { Slide, SlideTheme } from '@/types/slides'
+
 import message from '@/utils/message'
 import {useMainStore, useSlidesStore} from '@/store'
 import Input from '@/components/Input.vue'
@@ -139,8 +141,11 @@ import FullscreenSpin from '@/components/FullscreenSpin.vue'
 import OutlineEditor from '@/components/OutlineEditor.vue'
 
 const mainStore = useMainStore()
-const {templates} = storeToRefs(useSlidesStore())
-const {AIPPT} = useAIPPT()
+
+const slideStore = useSlidesStore()
+const { templates } = storeToRefs(slideStore)
+const { AIPPT, getMdContent } = useAIPPT()
+
 
 const language = ref<'zh' | 'en'>('zh')
 const keyword = ref('')
@@ -150,8 +155,10 @@ const loading = ref(false)
 const outlineCreating = ref(false)
 const outlineRef = ref<HTMLElement>()
 const inputRef = ref<InstanceType<typeof Input>>()
-const step = ref<'setup' | 'outline' | 'template' | 'paste'>('setup')
-const model = ref('doubao-1.5-pro-32k')
+
+const step = ref<'setup' | 'outline' | 'template'>('setup')
+const model = ref('GLM-4-Flash')
+
 
 const recommends = ref([
 
@@ -186,7 +193,32 @@ const setKeyword = (value: string) => {
 }
 
 const createOutline = async () => {
-    if (!keyword.value) return message.error('请先输入PPT主题')
+
+  if (!keyword.value) return message.error('请先输入PPT主题')
+
+  loading.value = true
+  outlineCreating.value = true
+
+  const stream = await api.AIPPT_Outline(keyword.value, language.value, model.value)
+
+  loading.value = false
+  step.value = 'outline'
+
+  const reader: ReadableStreamDefaultReader = stream.body.getReader()
+  const decoder = new TextDecoder('utf-8')
+
+  const readStream = () => {
+    reader.read().then(({ done, value }) => {
+      if (done) {
+        outline.value = getMdContent(outline.value)
+        outline.value = outline.value.replace(/<!--[\s\S]*?-->/g, '').replace(/<think>[\s\S]*?<\/think>/g, '')
+        outlineCreating.value = false
+        return
+      }
+
+      const chunk = decoder.decode(value, { stream: true })
+      outline.value += chunk
+
 
     loading.value = true
     outlineCreating.value = true
@@ -220,13 +252,18 @@ const createOutline = async () => {
 }
 
 const createPPT = async () => {
-    loading.value = true
 
-    const stream = await api.AIPPT(outline.value, language.value, 'doubao-1.5-pro-32k')
-    const templateSlides: Slide[] = await api.getFileData(selectedTemplate.value).then(ret => ret.slides)
+  loading.value = true
 
-    const reader: ReadableStreamDefaultReader = stream.body.getReader()
-    const decoder = new TextDecoder('utf-8')
+  const stream = await api.AIPPT(outline.value, language.value, model.value)
+  const templateData = await api.getFileData(selectedTemplate.value)
+  const templateSlides: Slide[] = templateData.slides
+  const templateTheme: SlideTheme = templateData.theme
+
+  const reader: ReadableStreamDefaultReader = stream.body.getReader()
+  const decoder = new TextDecoder('utf-8')
+
+
 
     const readStream = () => {
         reader.read().then(({done, value}) => {
