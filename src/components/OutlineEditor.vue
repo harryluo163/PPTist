@@ -1,17 +1,17 @@
 <template>
   <div class="outline-editor">
-    <div class="item" 
+    <div class="item"
       :class="[{ 'title': item.title }, `lv-${item.lv}`]"
       v-for="item in data"
       :key="item.id"
       :data-lv="item.lv"
       :data-id="item.id"
-      v-contextmenu="contextmenus" 
+      v-contextmenu="contextmenus"
     >
-      <Input 
-        class="editable-text" 
-        :value="item.content" 
-        v-if="activeItemId === item.id" 
+      <Input
+        class="editable-text"
+        :value="item.content"
+        v-if="activeItemId === item.id"
         @blur="$event => handleBlur($event, item)"
         @enter="$event => handleEnter($event, item)"
         @backspace="$event => handleBackspace($event, item)"
@@ -85,14 +85,14 @@ onMounted(() => {
       result.push({
         id: nanoid(),
         content,
-        lv: 4,
+        lv: 5,
       })
     }
     else {
       result.push({
         id: nanoid(),
         content: line.trim(),
-        lv: 4
+        lv: 5
       })
     }
   }
@@ -147,7 +147,7 @@ const addItem = (itemId: string, pos: 'next' | 'prev', content: string) => {
   if (!item) return
 
   const id = nanoid()
-  let lv = 4
+  let lv = 5
   let i = 0
   let title = false
 
@@ -163,9 +163,13 @@ const addItem = (itemId: string, pos: 'next' | 'prev', content: string) => {
     if (pos === 'prev') lv = 3
     else lv = 4
   }
-  else lv = 4
+  else if (item.lv === 4) {
+      if (pos === 'prev') lv = 4
+      else lv = 5
+  }
+  else lv = 5
 
-  if (lv < 4) title = true
+  if (lv < 5) title = true
 
   data.value.splice(i, 0, { id, content, lv, title })
 }
@@ -227,6 +231,22 @@ const contextmenus = (el: HTMLElement): ContextmenuItem[] => {
       },
     ]
   }
+  else if (lv === 4) {
+      return [
+          {
+              text: '上方添加同级大纲（项）',
+              handler: () => addItem(id, 'prev', '新的一项'),
+          },
+          {
+              text: '添加子级大纲（内容）',
+              handler: () => addItem(id, 'next', '新的一内容'),
+          },
+          {
+              text: '删除此内容',
+              handler: () => deleteItem(id, true),
+          },
+      ]
+  }
   return [
     {
       text: '上方添加同级大纲（项）',
@@ -277,6 +297,10 @@ const contextmenus = (el: HTMLElement): ContextmenuItem[] => {
     &.lv-4 {
       font-size: 13px;
       padding-left: 20px;
+    }
+    &.lv-5 {
+      font-size: 12px;
+      padding-left: 25px;
     }
   }
   .text {
@@ -332,12 +356,15 @@ const contextmenus = (el: HTMLElement): ContextmenuItem[] => {
     content: '主题';
   }
   .item.lv-2 .flag::after {
-    content: '章';
+    content: '章节';
   }
   .item.lv-3 .flag::after {
-    content: '节';
+    content: '页面';
   }
   .item.lv-4 .flag::after {
+    content: '项';
+  }
+  .item.lv-5 .flag::after {
     opacity: 0;
   }
 }

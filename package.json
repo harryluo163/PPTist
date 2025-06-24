@@ -1,6 +1,7 @@
 {
   "name": "pptist",
   "version": "2.0.0",
+  "node": "20.16.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -45,6 +46,7 @@
     "svg-pathdata": "^7.1.0",
     "tinycolor2": "^1.6.0",
     "tippy.js": "^6.3.7",
+    "vite-plugin-compression": "^0.5.1",
     "vue": "^3.4.34",
     "vuedraggable": "^4.1.0"
   },

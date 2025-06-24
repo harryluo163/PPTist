@@ -1,16 +1,17 @@
 import axios from './config'
 
 // export const SERVER_URL = 'http://localhost:5000'
-export const SERVER_URL = (import.meta.env.MODE === 'development') ? '/api' : 'https://server.pptist.cn'
-export const ASSET_URL = 'https://asset.pptist.cn'
-
+export const SERVER_URL = (import.meta.env.MODE === 'development') ? '/api' : '/aippt_data'
+// export const ASSET_URL = 'http://aacn-r194.centaline.com.cn:5173'
+// export const ASSET_URL = 'http://dataplat.centaline.com.cn'
 export default {
   getMockData(filename: string): Promise<any> {
     return axios.get(`./mocks/${filename}.json`)
   },
 
   getFileData(filename: string): Promise<any> {
-    return axios.get(`${ASSET_URL}/data/${filename}.json`)
+    return axios.get(`./mocks/${filename}.json`)
+    // return axios.get(`${ASSET_URL}/data/${filename}.json`)
   },
 
   AIPPT_Outline(

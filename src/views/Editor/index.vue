@@ -7,8 +7,8 @@
         <CanvasTool class="center-top" />
         <Canvas class="center-body" :style="{ height: `calc(100% - ${remarkHeight + 40}px)` }" />
         <Remark
-          class="center-bottom" 
-          v-model:height="remarkHeight" 
+          class="center-bottom"
+          v-model:height="remarkHeight"
           :style="{ height: `${remarkHeight}px` }"
         />
       </div>
@@ -22,7 +22,7 @@
   <MarkupPanel v-if="showMarkupPanel" />
 
   <Modal
-    :visible="!!dialogForExport" 
+    :visible="!!dialogForExport"
     :width="680"
     @closed="closeExportDialog()"
   >
@@ -30,7 +30,7 @@
   </Modal>
 
   <Modal
-    :visible="showAIPPTDialog" 
+    :visible="showAIPPTDialog"
     :width="680"
     :closeOnClickMask="false"
     :closeOnEsc="false"
@@ -42,7 +42,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import {onMounted, ref} from 'vue'
 import { storeToRefs } from 'pinia'
 import { useMainStore } from '@/store'
 import useGlobalHotkey from '@/hooks/useGlobalHotkey'
@@ -71,6 +71,22 @@ const remarkHeight = ref(40)
 
 useGlobalHotkey()
 usePasteEvent()
+const QueryString = (val: string): string | null => {
+    const uri = window.location.href;
+    const re = new RegExp(`${val}=([^\&\?]*)`, "ig");
+    const match = uri.match(re);
+    return match?.[0]?.substr(val.length + 1) || null; // 修正1：安全访问操作符
+}
+onMounted(() => {
+    setTimeout(() => {
+        //通过url参数p获取大纲
+        if (QueryString("p")) {
+            mainStore.setAIPPTDialogState(true)
+        }
+    }, 100)
+})
+
+
 </script>
 
 <style lang="scss" scoped>

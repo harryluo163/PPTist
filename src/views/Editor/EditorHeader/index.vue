@@ -27,14 +27,14 @@
       </Popover>
 
       <div class="title">
-        <Input 
-          class="title-input" 
+        <Input
+          class="title-input"
           ref="titleInputRef"
-          v-model:value="titleValue" 
-          @blur="handleUpdateTitle()" 
-          v-if="editingTitle" 
+          v-model:value="titleValue"
+          @blur="handleUpdateTitle()"
+          v-if="editingTitle"
         ></Input>
-        <div 
+        <div
           class="title-text"
           @click="startEditTitle()"
           :title="title"
@@ -62,9 +62,9 @@
       <div class="menu-item" v-tooltip="'导出'" @click="setDialogForExport('pptx')">
         <IconDownload class="icon" />
       </div>
-      <a class="github-link" v-tooltip="'Copyright © 2020-PRESENT pipipi-pikachu'" href="https://github.com/pipipi-pikachu/PPTist" target="_blank">
-        <div class="menu-item"><IconGithub class="icon" /></div>
-      </a>
+<!--      <a class="github-link" v-tooltip="'Copyright © 2020-PRESENT pipipi-pikachu'" href="https://github.com/pipipi-pikachu/PPTist" target="_blank">-->
+<!--        <div class="menu-item"><IconGithub class="icon" /></div>-->
+<!--      </a>-->
     </div>
 
     <Drawer
