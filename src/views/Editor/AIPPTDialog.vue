@@ -123,16 +123,14 @@
 </template>
 
 <script lang="ts" setup>
-import {ref, onMounted} from 'vue'
-import {storeToRefs} from 'pinia'
+import { ref, onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
 import api from '@/services'
 import useAIPPT from '@/hooks/useAIPPT'
-
 import type { AIPPTSlide } from '@/types/AIPPT'
 import type { Slide, SlideTheme } from '@/types/slides'
-
 import message from '@/utils/message'
-import {useMainStore, useSlidesStore} from '@/store'
+import { useMainStore, useSlidesStore } from '@/store'
 import Input from '@/components/Input.vue'
 import TextArea from '@/components/TextArea.vue'
 import Button from '@/components/Button.vue'
@@ -141,13 +139,13 @@ import FullscreenSpin from '@/components/FullscreenSpin.vue'
 import OutlineEditor from '@/components/OutlineEditor.vue'
 
 const mainStore = useMainStore()
-
 const slideStore = useSlidesStore()
 const { templates } = storeToRefs(slideStore)
-const { AIPPT, getMdContent } = useAIPPT()
+const { AIPPT, presetImgPool, getMdContent } = useAIPPT()
 
-
-const language = ref<'zh' | 'en'>('zh')
+const language = ref('中文')
+const style = ref('通用')
+const img = ref('')
 const keyword = ref('')
 const outline = ref('')
 const selectedTemplate = ref('template_5')
@@ -156,7 +154,7 @@ const outlineCreating = ref(false)
 const outlineRef = ref<HTMLElement>()
 const inputRef = ref<InstanceType<typeof Input>>()
 
-const step = ref<'setup' | 'outline' | 'template'>('setup')
+const step = ref<'paste' |'setup' | 'outline' | 'template'>('setup')
 const model = ref('GLM-4-Flash')
 
 
@@ -182,9 +180,20 @@ onMounted(() => {
             step.value = 'paste';
             history.replaceState({}, '', location.pathname);
         }
+
+        const paramT = QueryString("t");
+        if (paramT) {
+            // 修正2：类型守卫确保paramP存在
+            keyword.value =  decodeURI(paramT);;
+            outline.value =  decodeURI(paramT);;
+            step.value = 'template';
+            history.replaceState({}, '', location.pathname);
+        }
+
         // 修正3：安全访问DOM元素
         inputRef.value?.focus?.();
-    }, 400);
+
+    }, 300);
 });
 
 const setKeyword = (value: string) => {
@@ -196,34 +205,14 @@ const createOutline = async () => {
 
   if (!keyword.value) return message.error('请先输入PPT主题')
 
-  loading.value = true
-  outlineCreating.value = true
-
-  const stream = await api.AIPPT_Outline(keyword.value, language.value, model.value)
-
-  loading.value = false
-  step.value = 'outline'
-
-  const reader: ReadableStreamDefaultReader = stream.body.getReader()
-  const decoder = new TextDecoder('utf-8')
-
-  const readStream = () => {
-    reader.read().then(({ done, value }) => {
-      if (done) {
-        outline.value = getMdContent(outline.value)
-        outline.value = outline.value.replace(/<!--[\s\S]*?-->/g, '').replace(/<think>[\s\S]*?<\/think>/g, '')
-        outlineCreating.value = false
-        return
-      }
-
-      const chunk = decoder.decode(value, { stream: true })
-      outline.value += chunk
-
-
     loading.value = true
     outlineCreating.value = true
 
-    const stream = await api.AIPPT_Outline(keyword.value, language.value, model.value)
+    const stream = await api.AIPPT_Outline({
+        content: keyword.value,
+        language: language.value,
+        model: model.value,
+    })
 
     loading.value = false
     step.value = 'outline'
@@ -232,13 +221,15 @@ const createOutline = async () => {
     const decoder = new TextDecoder('utf-8')
 
     const readStream = () => {
-        reader.read().then(({done, value}) => {
+        reader.read().then(({ done, value }) => {
             if (done) {
+                outline.value = getMdContent(outline.value)
+                outline.value = outline.value.replace(/<!--[\s\S]*?-->/g, '').replace(/<think>[\s\S]*?<\/think>/g, '')
                 outlineCreating.value = false
                 return
             }
 
-            const chunk = decoder.decode(value, {stream: true})
+            const chunk = decoder.decode(value, { stream: true })
             outline.value += chunk
 
             if (outlineRef.value) {
@@ -252,32 +243,42 @@ const createOutline = async () => {
 }
 
 const createPPT = async () => {
+    loading.value = true
 
-  loading.value = true
+    const stream = await api.AIPPT({
+        content: outline.value,
+        language: language.value,
+        style: style.value,
+        model: model.value,
+    })
 
-  const stream = await api.AIPPT(outline.value, language.value, model.value)
-  const templateData = await api.getFileData(selectedTemplate.value)
-  const templateSlides: Slide[] = templateData.slides
-  const templateTheme: SlideTheme = templateData.theme
+    if (img.value === 'test') {
+        const imgs = await api.getMockData('imgs')
+        presetImgPool(imgs)
+    }
 
-  const reader: ReadableStreamDefaultReader = stream.body.getReader()
-  const decoder = new TextDecoder('utf-8')
+    const templateData = await api.getFileData(selectedTemplate.value)
+    const templateSlides: Slide[] = templateData.slides
+    const templateTheme: SlideTheme = templateData.theme
 
-
+    const reader: ReadableStreamDefaultReader = stream.body.getReader()
+    const decoder = new TextDecoder('utf-8')
 
     const readStream = () => {
-        reader.read().then(({done, value}) => {
+        reader.read().then(({ done, value }) => {
             if (done) {
                 loading.value = false
                 mainStore.setAIPPTDialogState(false)
+                slideStore.setTheme(templateTheme)
                 return
             }
 
-            const chunk = decoder.decode(value, {stream: true})
+            const chunk = decoder.decode(value, { stream: true })
             try {
                 const slide: AIPPTSlide = JSON.parse(chunk)
                 AIPPT(templateSlides, [slide])
-            } catch (err) {
+            }
+            catch (err) {
                 // eslint-disable-next-line
                 console.error(err)
             }
@@ -291,173 +292,144 @@ const createPPT = async () => {
 
 <style lang="scss" scoped>
 .aippt-dialog {
-  margin: -20px;
-  padding: 30px;
+    margin: -20px;
+    padding: 30px;
 }
-
 .header {
-  margin-bottom: 12px;
+    margin-bottom: 12px;
 
-  .title {
-    font-weight: 700;
-    font-size: 20px;
-    margin-right: 8px;
-    background: linear-gradient(270deg, #d897fd, #33bcfc);
-    background-clip: text;
-    color: transparent;
-    vertical-align: text-bottom;
-    line-height: 1.1;
-  }
-
-  .subtite {
-    color: #888;
-    font-size: 12px;
-  }
+    .title {
+        font-weight: 700;
+        font-size: 20px;
+        margin-right: 8px;
+        background: linear-gradient(270deg, #d897fd, #33bcfc);
+        background-clip: text;
+        color: transparent;
+        vertical-align: text-bottom;
+        line-height: 1.1;
+    }
+    .subtite {
+        color: #888;
+        font-size: 12px;
+    }
 }
-
 .preview {
-  pre {
-    max-height: 450px;
-    padding: 10px;
-    margin-bottom: 15px;
-    background-color: #f1f1f1;
-    overflow: auto;
-  }
-
-  .outline-view {
-    max-height: 450px;
-    padding: 10px;
-    margin-bottom: 15px;
-    background-color: #f1f1f1;
-    overflow: auto;
-  }
-
-  .btns {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    .btn {
-      width: 120px;
-      margin: 0 5px;
+    pre {
+        max-height: 450px;
+        padding: 10px;
+        margin-bottom: 15px;
+        background-color: #f1f1f1;
+        overflow: auto;
     }
-  }
-}
+    .outline-view {
+        max-height: 450px;
+        padding: 10px;
+        margin-bottom: 15px;
+        background-color: #f1f1f1;
+        overflow: auto;
+    }
+    .btns {
+        display: flex;
+        justify-content: center;
+        align-items: center;
 
+        .btn {
+            width: 120px;
+            margin: 0 5px;
+        }
+    }
+}
 .select-template {
-  .templates {
-    display: flex;
-    margin-bottom: 10px;
-    max-height: 400px; /* 设置容器的最大高度，根据需求调整 */
-    overflow-y: auto; /* 启用垂直滚动 */
-    @include flex-grid-layout();
+    .templates {
+        display: flex;
+        margin-bottom: 10px;
+        @include flex-grid-layout();
 
-    .template {
-      border: 2px solid $borderColor;
-      border-radius: $borderRadius;
-      width: 300px;
-      height: 172.75px;
-      margin-bottom: 12px;
+        .template {
+            border: 2px solid $borderColor;
+            border-radius: $borderRadius;
+            width: 324px;
+            height: 184px;
+            margin-bottom: 12px;
 
-      &:not(:nth-child(2n)) {
-        margin-right: 12px;
-      }
+            &:not(:nth-child(2n)) {
+                margin-right: 12px;
+            }
 
-      &.selected {
-        border-color: $themeColor;
-      }
+            &.selected {
+                border-color: $themeColor;
+            }
 
-      img {
-        width: 100%;
-      }
+            img {
+                width: 100%;
+            }
+        }
     }
-  }
+    .btns {
+        display: flex;
+        justify-content: center;
+        align-items: center;
 
-  .btns {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    .btn {
-      width: 120px;
-      margin: 0 5px;
+        .btn {
+            width: 120px;
+            margin: 0 5px;
+        }
     }
-  }
 }
-
-.configs {
-  margin-top: 5px;
-  display: flex;
-  justify-content: space-between;
-
-  .items {
-    display: flex;
-  }
-
-  .item {
-    margin-right: 5px;
-  }
-}
-
 .recommends {
-  display: flex;
-  flex-wrap: wrap;
-  margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 10px;
 
-  .recommend {
+    .recommend {
+        font-size: 12px;
+        background-color: #f1f1f1;
+        border-radius: $borderRadius;
+        padding: 3px 5px;
+        margin-right: 5px;
+        margin-top: 5px;
+        cursor: pointer;
+
+        &:hover {
+            color: $themeColor;
+        }
+    }
+}
+.configs {
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-between;
+
+    .config-item {
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+    }
+}
+.count {
     font-size: 12px;
-    background-color: #f1f1f1;
+    color: #999;
+    margin-right: 10px;
+}
+.submit {
+    height: 20px;
+    font-size: 12px;
+    background-color: $themeColor;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    padding: 0 8px 0 6px;
     border-radius: $borderRadius;
-    padding: 3px 5px;
-    margin-right: 5px;
-    margin-top: 5px;
     cursor: pointer;
 
     &:hover {
-      color: $themeColor;
+        background-color: $themeHoverColor;
     }
-  }
-}
 
-.model-selector {
-  margin-top: 10px;
-  font-size: 13px;
-  display: flex;
-  align-items: center;
-}
-
-.count {
-  font-size: 12px;
-  color: #999;
-  margin-right: 10px;
-}
-
-.language {
-  font-size: 12px;
-  margin-right: 10px;
-  color: $themeColor;
-  cursor: pointer;
-}
-
-.submit {
-  height: 20px;
-  font-size: 12px;
-  background-color: $themeColor;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  padding: 0 5px;
-  border-radius: $borderRadius;
-  cursor: pointer;
-
-  &:hover {
-    background-color: $themeHoverColor;
-  }
-
-  .icon {
-    font-size: 15px;
-    margin-right: 3px;
-  }
+    .icon {
+        font-size: 15px;
+        margin-right: 3px;
+    }
 }
 </style>
 <style>
