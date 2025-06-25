@@ -80,7 +80,7 @@ const QueryString = (val: string): string | null => {
 onMounted(() => {
     setTimeout(() => {
         //通过url参数p获取大纲
-        if (QueryString("p")) {
+        if (QueryString("p")||QueryString("t")) {
             mainStore.setAIPPTDialogState(true)
         }
     }, 100)
