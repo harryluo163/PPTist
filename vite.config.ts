@@ -40,5 +40,21 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
+  },
+  // 新增以下配置以支持调试
+  build: {
+    minify: false, // 保持压缩（可选，如果不需要压缩可设为false）
+    sourcemap: true, // 生成source map文件
+    cssMinify: false, // 压缩CSS（可选）
+    rollupOptions: {
+      output: {
+        // 保留模块间的函数名（对调试有帮助）
+        preserveModules: false,
+        // 可选：手动控制sourcemap生成
+        sourcemap: true,
+        // 可选：为特定文件生成sourcemap
+        // sourcemapExcludeSources: false
+      }
+    }
   }
 })

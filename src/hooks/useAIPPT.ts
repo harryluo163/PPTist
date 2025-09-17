@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import { nanoid } from 'nanoid'
-import type { ImageClipDataRange, PPTElement, PPTImageElement, PPTShapeElement, PPTTextElement, Slide, TextType } from '@/types/slides'
+import type { ImageClipDataRange, PPTElement, PPTImageElement, PPTShapeElement, PPTTextElement, Slide, TextType, ImageType } from '@/types/slides'
 import type { AIPPTSlide } from '@/types/AIPPT'
 import { useSlidesStore } from '@/store'
 import useAddSlidesOrElements from './useAddSlidesOrElements'
@@ -25,22 +25,56 @@ export default () => {
   const checkTextType = (el: PPTElement, type: TextType) => {
     return (el.type === 'text' && el.textType === type) || (el.type === 'shape' && el.text && el.text.type === type)
   }
-  
-  const getUseableTemplates = (templates: Slide[], n: number, type: TextType) => {
+// 添加图片元素检查函数
+  const checkImageType = (el: PPTElement, type: ImageType) => {
+    return el.type === 'image' && el.imageType === type
+  }
+
+  const getUseableTemplates_new = (
+      templates: Slide[],
+      itemCount: number,
+      type: TextType,
+      imageCount?: number,
+      imageType?: ImageType
+  ) => {
+    // 如果没有指定图片参数，使用原有逻辑
+    if (imageCount === undefined || imageType === undefined) {
+      // 原有的文本匹配逻辑...
+      return getUseableTemplates(templates, itemCount, type)
+    }
+    // 新的混合匹配逻辑
+    const list = templates.filter(slide => {
+      const textElements = slide.elements.filter(el => checkTextType(el, type)).length
+      const imageElements = slide.elements.filter(el => checkImageType(el, imageType)).length
+      return textElements == itemCount && imageElements == imageCount
+    })
+    if (list.length > 0) {
+      return list
+    }
+    if (list.length === 0) {
+      return getUseableTemplates(templates, itemCount, type)
+    }
+  }
+    const getUseableTemplates = (templates: Slide[], n: number, type: TextType) => {
+      //剔除itemFigure
+      templates= templates.filter(slide => {
+        const itemFigures = slide.elements.filter(el => checkImageType(el, 'itemFigure'))
+        return itemFigures.length === 0
+      })
     if (n === 1) {
       const list = templates.filter(slide => {
         const items = slide.elements.filter(el => checkTextType(el, type))
         const titles = slide.elements.filter(el => checkTextType(el, 'title'))
         const texts = slide.elements.filter(el => checkTextType(el, 'content'))
-  
+
         return !items.length && titles.length === 1 && texts.length === 1
       })
-  
+
       if (list.length) return list
     }
-  
+
     let target: Slide | null = null
-  
+
     const list = templates.filter(slide => {
       const len = slide.elements.filter(el => checkTextType(el, type)).length
       return len >= n
@@ -60,14 +94,14 @@ export default () => {
         return (currentLen - n) <= (closestLen - n) ? current : closest
       })
     }
-  
+
     return templates.filter(slide => {
       const len = slide.elements.filter(el => checkTextType(el, type)).length
       const targetLen = target!.elements.filter(el => checkTextType(el, type)).length
       return len === targetLen
     })
   }
-  
+
   const getAdaptedFontsize = ({
     text,
     fontSize,
@@ -83,42 +117,42 @@ export default () => {
   }) => {
     const canvas = document.createElement('canvas')
     const context = canvas.getContext('2d')!
-  
+
     let newFontSize = fontSize
     const minFontSize = 10
-  
+
     while (newFontSize >= minFontSize) {
       context.font = `${newFontSize}px ${fontFamily}`
       const textWidth = context.measureText(text).width
       const line = Math.ceil(textWidth / width)
-  
+
       if (line <= maxLine) return newFontSize
-  
+
       const step = newFontSize <= 22 ? 1 : 2
       newFontSize = newFontSize - step
     }
-  
+
     return minFontSize
   }
-  
+
   const getFontInfo = (htmlString: string) => {
     const fontSizeRegex = /font-size:\s*(\d+(?:\.\d+)?)\s*px/i
     const fontFamilyRegex = /font-family:\s*['"]?([^'";]+)['"]?\s*(?=;|>|$)/i
-  
+
     const defaultInfo = {
       fontSize: 16,
       fontFamily: 'Microsoft Yahei',
     }
-  
+
     const fontSizeMatch = htmlString.match(fontSizeRegex)
     const fontFamilyMatch = htmlString.match(fontFamilyRegex)
-  
+
     return {
       fontSize: fontSizeMatch ? (+fontSizeMatch[1].trim()) : defaultInfo.fontSize,
       fontFamily: fontFamilyMatch ? fontFamilyMatch[1].trim() : defaultInfo.fontFamily,
     }
   }
-  
+
   const getNewTextElement = ({
     el,
     text,
@@ -134,9 +168,9 @@ export default () => {
   }): PPTTextElement | PPTShapeElement => {
     const padding = 10
     const width = el.width - padding * 2 - 2
-  
+
     let content = el.type === 'text' ? el.content : el.text!.content
-  
+
     const fontInfo = getFontInfo(content)
     const size = getAdaptedFontsize({
       text: longestText || text,
@@ -145,12 +179,12 @@ export default () => {
       width,
       maxLine,
     })
-  
+
     const parser = new DOMParser()
     const doc = parser.parseFromString(content, 'text/html')
-  
+
     const treeWalker = document.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT)
-  
+
     const firstTextNode = treeWalker.nextNode()
     if (firstTextNode) {
       if (digitPadding && firstTextNode.textContent && firstTextNode.textContent.length === 2 && text.length === 1) {
@@ -158,37 +192,41 @@ export default () => {
       }
       else firstTextNode.textContent = text
     }
-  
+
     if (doc.body.innerHTML.indexOf('font-size') === -1) {
       const p = doc.querySelector('p')
       if (p) p.style.fontSize = '16px'
     }
-  
+
     content = doc.body.innerHTML.replace(/font-size:(.+?)px/g, `font-size: ${size}px`)
-  
+
     return el.type === 'text' ? { ...el, content, lineHeight: size < 15 ? 1.2 : el.lineHeight } : { ...el, text: { ...el.text!, content } }
   }
 
   const getUseableImage = (el: PPTImageElement): ImgPoolItem | null => {
     let img: ImgPoolItem | null = null
-  
+
     let imgs = []
-  
+
     if (el.width === el.height) imgs = imgPool.value.filter(img => img.width === img.height)
     else if (el.width > el.height) imgs = imgPool.value.filter(img => img.width > img.height)
     else imgs = imgPool.value.filter(img => img.width <= img.height)
     if (!imgs.length) imgs = imgPool.value
-  
+
     img = imgs[Math.floor(Math.random() * imgs.length)]
     imgPool.value = imgPool.value.filter(item => item.id !== img!.id)
-  
+
     return img
   }
-  
-  const getNewImgElement = (el: PPTImageElement): PPTImageElement => {
+
+  const getNewImgElement = (el: PPTImageElement, imgSrc?: string): PPTImageElement => {
+    if (imgSrc) {
+      // 直接使用提供的图片URL
+      return { ...el, src: imgSrc }
+    }
     const img = getUseableImage(el)
     if (!img) return el
-  
+
     let scale = 1
     let w = el.width
     let h = el.height
@@ -209,17 +247,17 @@ export default () => {
     const clipShape = (el.clip && el.clip.shape) ? el.clip.shape : 'rect'
     const clip = { range, shape: clipShape }
     const src = img.src
-  
+
     return { ...el, src, clip }
   }
-  
+
   const getMdContent = (content: string) => {
     const regex = /```markdown([^```]*)```/
     const match = content.match(regex)
     if (match) return match[1].trim()
     return content.replace('```markdown', '').replace('```', '')
   }
-  
+
   const getJSONContent = (content: string) => {
     const regex = /```json([^```]*)```/
     const match = content.match(regex)
@@ -239,7 +277,10 @@ export default () => {
     const AISlides: AIPPTSlide[] = []
     for (const template of _AISlides) {
       if (template.type === 'content') {
-        const items = template.data.items
+        //剔除itemFigure
+        const items = template.data.items.filter(item => {
+          return item.type === 'title'
+        })
         if (items.length === 5 || items.length === 6) {
           const items1 = items.slice(0, 3)
           const items2 = items.slice(3)
@@ -305,7 +346,7 @@ export default () => {
     }
 
     const slides = []
-    
+
     for (const item of AISlides) {
       if (item.type === 'cover') {
         const coverTemplate = coverTemplates[Math.floor(Math.random() * coverTemplates.length)]
@@ -365,11 +406,11 @@ export default () => {
               if (aItemNumber.type === 'shape') aContent = aItemNumber.text!.content
               if (bItemNumber.type === 'text') bContent = bItemNumber.content
               if (bItemNumber.type === 'shape') bContent = bItemNumber.text!.content
-  
+
               if (aContent && bContent) {
                 const aIndex = parseInt(aContent)
                 const bIndex = parseInt(bContent)
-  
+
                 return aIndex - bIndex
               }
             }
@@ -431,9 +472,14 @@ export default () => {
         })
       }
       else if (item.type === 'content') {
-        const _contentTemplates = getUseableTemplates(contentTemplates, item.data.items.length, 'item')
+        const _contentTemplates = getUseableTemplates_new(contentTemplates, item.data.items.filter(item => item.type === 'title').length, 'item',item.data.items.filter(item => item.type === 'itemFigure').length, 'itemFigure')!; // 使用非空断言操作符
         const contentTemplate = _contentTemplates[Math.floor(Math.random() * _contentTemplates.length)]
-
+        const itemFigureItem = item.data.items.filter(
+            item => item.type === 'itemFigure' && item.src
+        );
+        const titleItem = item.data.items.filter(
+            item => item.type === 'title'
+        );
         const sortedTitleItemIds = contentTemplate.elements.filter(el => checkTextType(el, 'itemTitle')).sort((a, b) => {
           const aIndex = a.left + a.top * 2
           const bIndex = b.left + b.top * 2
@@ -452,10 +498,15 @@ export default () => {
           return aIndex - bIndex
         }).map(el => el.id)
 
+        const sortedItemFigureItemIds = contentTemplate.elements.filter(el => checkImageType(el, 'itemFigure')).sort((a, b) => {
+          const aIndex = a.left + a.top * 2
+          const bIndex = b.left + b.top * 2
+          return aIndex - bIndex
+        }).map(el => el.id)
         const itemTitles = []
         const itemTexts = []
-
-        for (const _item of item.data.items) {
+        const titleItemIds: string[] = []
+        for (const _item of titleItem) {
           if (_item.title) itemTitles.push(_item.title)
           if (_item.text) itemTexts.push(_item.text)
         }
@@ -463,25 +514,54 @@ export default () => {
         const longestText = itemTexts.reduce((longest, current) => current.length > longest.length ? current : longest, '')
 
         const elements = contentTemplate.elements.map(el => {
-          if (el.type === 'image' && el.imageType && imgPool.value.length) return getNewImgElement(el)
-          if (el.type !== 'text' && el.type !== 'shape') return el
-          if (item.data.items.length === 1) {
-            const contentItem = item.data.items[0]
-            if (checkTextType(el, 'content') && contentItem.text) {
-              return getNewTextElement({ el, text: contentItem.text, maxLine: 6 })
+          if (el.type === 'image' && el.imageType === 'itemFigure') {
+            const index = sortedItemFigureItemIds.findIndex(id => id === el.id)
+            const contentItem = itemFigureItem[index]
+            if (contentItem && contentItem.src) {
+              return getNewImgElement(el, contentItem.src);
             }
+
+            // 如果传入数据中没有图片，尝试从图片池获取
+            if (imgPool.value.length) {
+              return getNewImgElement(el);
+            }
+
+            // 都没有则保持原样
+            return el;
+          }
+
+          if (el.type !== 'text' && el.type !== 'shape') return el
+            if (titleItem.length === 1) {
+              const contentItem = titleItem[0]
+              if (checkTextType(el, 'content') && contentItem.text) {
+                return getNewTextElement({ el, text: contentItem.text, maxLine: 6 })
+              }
+              if (checkTextType(el, 'itemTitle')) {
+                const index = sortedTitleItemIds.findIndex(id => id === el.id)
+                const contentItem = titleItem[index]
+                if (contentItem && contentItem.title) {
+                  return getNewTextElement({ el, text: contentItem.title, longestText: longestTitle, maxLine: 1 })
+                }
+              }
+              if (checkTextType(el, 'item')) {
+                const index = sortedTextItemIds.findIndex(id => id === el.id)
+                const contentItem = titleItem[index]
+                if (contentItem && contentItem.text) {
+                  return getNewTextElement({ el, text: contentItem.text, longestText, maxLine: 4 })
+                }
+              }
           }
           else {
             if (checkTextType(el, 'itemTitle')) {
               const index = sortedTitleItemIds.findIndex(id => id === el.id)
-              const contentItem = item.data.items[index]
+              const contentItem = titleItem[index]
               if (contentItem && contentItem.title) {
                 return getNewTextElement({ el, text: contentItem.title, longestText: longestTitle, maxLine: 1 })
               }
             }
             if (checkTextType(el, 'item')) {
               const index = sortedTextItemIds.findIndex(id => id === el.id)
-              const contentItem = item.data.items[index]
+              const contentItem = titleItem[index]
               if (contentItem && contentItem.text) {
                 return getNewTextElement({ el, text: contentItem.text, longestText, maxLine: 4 })
               }

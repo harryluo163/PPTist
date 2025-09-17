@@ -1,6 +1,6 @@
 <template>
   <div class="remark">
-    <div 
+    <div
       class="resize-handler"
       @mousedown="$event => resize($event)"
     ></div>
@@ -30,6 +30,7 @@ const emit = defineEmits<{
 const slidesStore = useSlidesStore()
 const { currentSlide } = storeToRefs(slidesStore)
 
+
 const editorRef = ref<InstanceType<typeof Editor>>()
 watch(() => currentSlide.value.id, () => {
   nextTick(() => {
@@ -41,7 +42,9 @@ watch(() => currentSlide.value.id, () => {
 
 const remark = computed(() => currentSlide.value?.remark || '')
 
+
 const handleInput = (content: string) => {
+    console.log('Updating remark:', content) // 调试用
   slidesStore.updateSlide({ remark: content })
 }
 

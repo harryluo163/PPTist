@@ -29,7 +29,7 @@ export interface AIPPTContent {
     items: {
       title?: string
       text?: string
-      type?: 'text' | 'image'
+      type?: 'title' | 'itemFigure'
       src?: string  // 图片URL
     }[]
   },

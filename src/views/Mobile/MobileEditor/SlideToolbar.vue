@@ -3,7 +3,7 @@
     <div class="remark">
       <textarea
         :value="remark"
-        placeholder="点击输入演讲者备注"
+        placeholder="在此处输入视频脚本/演讲字幕。如果没有灵感？试试直接点击上方的“Ai生成脚本”，可以获得更丰富更有表现力的视频效果哦，快来试试吧！"
         @input="$event => handleInputMark($event)"
       ></textarea>
     </div>

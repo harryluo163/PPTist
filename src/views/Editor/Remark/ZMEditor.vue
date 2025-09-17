@@ -1,38 +1,7 @@
 <template>
 
     <div class="editor" v-click-outside="hideMenuInstance">
-        <div data-v-a3544495="" class="editor-button-panel" style="
-    position: relative;
-    border-bottom: 1px solid #e5e7eb;
-    display: flex;
-">
-            <div data-v-a3544495="" class="handler-item group-btn" style="margin-left: auto;">
 
-                <Button @click="AIZMpageVisible=true;"  class="button default" style="
-                  flex: 1 1 0%;
-                  margin: 7px;
-                  height: 24px;
-                  line-height: 24px;
-                  padding: 0px 18px;
-                  border-radius: 6px;
-
-">
-                <span style="margin-left: 2px;    background: linear-gradient(270deg, #d897fd, #33bcfc);
-                  background-clip: text;
-                  color: transparent;
-                  font-weight: 700;">AI生成脚本</span>
-                </Button>
-                <Button @click="openZMPanel" class="button default" style="
-    flex: 1 1 0%;
-    margin: 7px;
-    height: 24px;
-    line-height: 24px;
-    padding: 0px 18px;
-    border-radius: 6px;">
-                    <IconAlignTextBothOne class="icon"  style="color:#d14424" />
-                    <span style="margin-left: 2px;">脚本总览模式</span></Button>
-            </div>
-        </div>
         <div
                 class="prosemirror-editor"
                 ref="editorViewRef"
@@ -82,7 +51,7 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, onUnmounted, ref, watch} from 'vue'
+import {onMounted, onUnmounted, ref} from 'vue'
 import {debounce} from 'lodash'
 import {useMainStore, useSlidesStore} from '@/store'
 import type {EditorView} from 'prosemirror-view'
@@ -108,7 +77,6 @@ const emit = defineEmits<{
 }>()
 
 const mainStore = useMainStore()
-const { AIZMpageVisible } = storeToRefs(mainStore)
 
 const editorViewRef = ref<HTMLElement>()
 let editorView: EditorView
@@ -118,21 +86,13 @@ const attr = ref<TextAttrs>()
 const menuInstance = ref<Instance>()
 const menuRef = ref<HTMLElement>()
 
-watch(() => props.value, (newVal) => {
-    if (newVal !== editorView.dom.innerHTML) {
-        updateTextContent()
-    }
-})
 const hideMenuInstance = () => {
     if (menuInstance.value) menuInstance.value.hide()
 }
+
 const handleInput = () => {
     emit('update', editorView.dom.innerHTML) // 实时触发
 }
-// const handleInput = debounce(function () {
-//     emit('update', editorView.dom.innerHTML)
-// }, 30, {trailing: true})
-
 const handleFocus = () => {
     mainStore.setDisableHotkeysState(true)
 }
@@ -147,7 +107,6 @@ const updateTextContent = () => {
     if (!editorView) return
     const {doc, tr} = editorView.state
     editorView.dispatch(tr.replaceRangeWith(0, doc.content.size, createDocument(props.value)))
-    emit('update', editorView.dom.innerHTML)
 }
 
 defineExpose({updateTextContent})
@@ -232,8 +191,8 @@ onMounted(() => {
                 window.getSelection()?.removeAllRanges()
                 hideMenuInstance()
             },
-            keydown:hideMenuInstance,
-
+            keydown: hideMenuInstance,
+            input: handleInput,
         },
         dispatchTransaction(transaction) {
             // 1. 应用事务到当前状态
@@ -241,6 +200,8 @@ onMounted(() => {
 
             // 2. 检查文档是否实际变化（避免选区变化等无关更新）
             if (transaction.docChanged) {
+
+                // 可以在这里触发自定义逻辑（如保存、同步等）
                 console.log('Updating remark:', newState.doc.textContent) // 调试用
                 slidesStore.updateSlide({ remark: newState.doc.textContent })
             }

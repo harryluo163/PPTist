@@ -1,6 +1,6 @@
 <template>
-  <div 
-    class="prosemirror-editor" 
+  <div
+    class="prosemirror-editor"
     :class="{ 'format-painter': textFormatPainter }"
     ref="editorViewRef"
     @mousedown="$event => emit('mousedown', $event)"
@@ -88,7 +88,7 @@ const handleKeydown = (editorView: EditorView, e: KeyboardEvent) => {
   const { ctrlKey, shiftKey, metaKey } = e
   const ctrlActive = ctrlKey || shiftKey || metaKey
   const key = e.key.toUpperCase()
-  
+
   const isHanldeHistory = ctrlActive && (key === KEYS.Z || key === KEYS.Y)
 
   handleInput(isHanldeHistory)

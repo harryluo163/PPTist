@@ -137,9 +137,11 @@ import Button from '@/components/Button.vue'
 import Select from '@/components/Select.vue'
 import FullscreenSpin from '@/components/FullscreenSpin.vue'
 import OutlineEditor from '@/components/OutlineEditor.vue'
+import useSlideHandler from "@/hooks/useSlideHandler";
 
 const mainStore = useMainStore()
 const slideStore = useSlidesStore()
+const { resetSlides } = useSlideHandler()
 const { templates } = storeToRefs(slideStore)
 const { AIPPT, presetImgPool, getMdContent } = useAIPPT()
 
@@ -243,6 +245,71 @@ const createOutline = async () => {
 }
 
 const createPPT = async () => {
+    // 在生成前清空PPT
+    resetSlides()
+    //
+    // const templateData = await api.getFileData(selectedTemplate.value)
+    // const templateSlides: Slide[] = templateData.slides
+    // const templateTheme: SlideTheme = templateData.theme
+    //
+    // const slide =
+    //     [
+    //     {
+    //     "type": "cover",
+    //     "data": {
+    //         "title": "深圳2025年5月房地产市场分析报告",
+    //         "text": "新房降温，二手房活跃，市场分化加剧"
+    //     }
+    // },{
+    //     "type": "contents",
+    //     "data": {
+    //         "items": [
+    //             "市场概况",
+    //             "新房市场分析",
+    //             "二手房市场分析",
+    //             "市场趋势分析",
+    //             "建议与展望"
+    //         ]
+    //     }
+    // },{
+    //     "type": "transition",
+    //     "data": {
+    //         "title": "市场概况",
+    //         "text": "新房降温，二手房活跃，市场呈现分化趋势"
+    //     }
+    // },{
+    //     "type": "content",
+    //     "data": {
+    //         "title": "市场概况",
+    //         "items": [
+    //             {
+    //                 "type": "title",
+    //                 "title": "新房市场降温",
+    //                 "text": "2025年5月，深圳新房住宅成交量环比下降7.99%，同比下降26.12%，显示出市场短期降温趋势。"
+    //             },
+    //             {
+    //                 "type": "title",
+    //                 "title": "二手房市场活跃",
+    //                 "text": "二手住宅成交量虽环比下降18.2%，但同比仍增长18.3%，市场韧性较强，成交活跃。"
+    //             },
+    //             {
+    //                 "type": "title",
+    //                 "title": "区域分化明显",
+    //                 "text": "龙华区新房成交面积领先，龙岗区二手房过户量最高，核心区（福田、南山、罗湖）合计占比达45%。"
+    //             },
+    //             {
+    //                 "type": "itemFigure",
+    //                 "src": "https://gpt-vis-ssr.centanet.com/images/e621c0b2-8239-4af3-a6b2-347b51fb838d.png"
+    //             }
+    //         ]
+    //     }
+    // }]
+    //
+    //
+    //
+    //
+    // AIPPT(templateSlides, slide)
+
     loading.value = true
 
     const stream = await api.AIPPT({

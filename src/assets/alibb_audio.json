@@ -1,0 +1,270 @@
+[
+  {
+    "适用场景": "通用场景",
+    "音色列表": [
+      {
+        "音色": "知楠",
+        "音频试听": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20230713/cymq/知楠.wav",
+        "model参数": "sambert-zhinan-v1",
+        "特色": "广告男声",
+        "默认采样率（Hz）": "48k"
+      },
+      {
+        "音色": "知琪",
+        "音频试听": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20230712/wnqs/知琪.wav",
+        "model参数": "sambert-zhiqi-v1",
+        "特色": "温柔女声",
+        "默认采样率（Hz）": "48k"
+      },
+      {
+        "音色": "知浩",
+        "音频试听": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20230713/bmnx/知浩.wav",
+        "model参数": "sambert-zhihao-v1",
+        "特色": "咨询男声",
+        "默认采样率（Hz）": "16k"
+      },
+      {
+        "音色": "知婧",
+        "音频试听": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20230713/lmgc/知婧.wav",
+        "model参数": "sambert-zhijing-v1",
+        "特色": "严厉女声",
+        "默认采样率（Hz）": "16k"
+      },
+      {
+        "音色": "知茗",
+        "音频试听": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20230713/enps/知茗.wav",
+        "model参数": "sambert-zhiming-v1",
+        "特色": "诙谐男声",
+        "默认采样率（Hz）": "16k"
+      },
+      {
+        "音色": "知墨",
+        "音频试听": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20230713/ipxx/知墨.wav",
+        "model参数": "sambert-zhimo-v1",
+        "特色": "情感男声",
+        "默认采样率（Hz）": "16k"
+      },
+      {
+        "音色": "知娜",
+        "音频试听": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20230713/zyza/知娜.wav",
+        "model参数": "sambert-zhina-v1",
+        "特色": "浙普女声",
+        "默认采样率（Hz）": "16k"
+      },
+      {
+        "音色": "知树",
+        "音频试听": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20230713/pzzm/知树.wav",
+        "model参数": "sambert-zhishu-v1",
+        "特色": "资讯男声",
+        "默认采样率（Hz）": "16k"
+      },
+      {
+        "音色": "知莎",
+        "音频试听": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20230712/rtbv/知莎.wav",
+        "model参数": "sambert-zhistella-v1",
+        "特色": "知性女声",
+        "默认采样率（Hz）": "16k"
+      },
+      {
+        "音色": "知婷",
+        "音频试听": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20230713/wwpw/知婷.wav",
+        "model参数": "sambert-zhiting-v1",
+        "特色": "电台女声",
+        "默认采样率（Hz）": "16k"
+      },
+      {
+        "音色": "知笑",
+        "音频试听": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20230713/mrcm/知笑.wav",
+        "model参数": "sambert-zhixiao-v1",
+        "特色": "资讯女声",
+        "默认采样率（Hz）": "16k"
+      },
+      {
+        "音色": "知雅",
+        "音频试听": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20230713/ofma/知雅.wav",
+        "model参数": "sambert-zhiya-v1",
+        "特色": "严厉女声",
+        "默认采样率（Hz）": "16k"
+      },
+      {
+        "音色": "知晔",
+        "音频试听": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20230713/xewu/知晔.wav",
+        "model参数": "sambert-zhiye-v1",
+        "特色": "青年男声",
+        "默认采样率（Hz）": "16k"
+      },
+      {
+        "音色": "知颖",
+        "音频试听": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20230713/lrbj/知颖.wav",
+        "model参数": "sambert-zhiying-v1",
+        "特色": "软萌童声",
+        "默认采样率（Hz）": "16k"
+      },
+      {
+        "音色": "知媛",
+        "音频试听": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20230713/lkvm/知媛.wav",
+        "model参数": "sambert-zhiyuan-v1",
+        "特色": "知心姐姐",
+        "默认采样率（Hz）": "16k"
+      }
+    ]
+  },
+  {
+    "适用场景": "新闻播报",
+    "音色列表": [
+      {
+        "音色": "知厨",
+        "音频试听": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20230712/enuf/知厨.wav",
+        "model参数": "sambert-zhichu-v1",
+        "特色": "舌尖男声",
+        "默认采样率（Hz）": "48k"
+      },
+      {
+        "音色": "知德",
+        "音频试听": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20230713/bfcm/知德.wav",
+        "model参数": "sambert-zhide-v1",
+        "特色": "新闻男声",
+        "默认采样率（Hz）": "48k"
+      },
+      {
+        "音色": "知佳",
+        "音频试听": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20230712/acre/知佳.wav",
+        "model参数": "sambert-zhijia-v1",
+        "特色": "标准女声",
+        "默认采样率（Hz）": "48k"
+      },
+      {
+        "音色": "知茹",
+        "音频试听": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20230712/motm/知茹.wav",
+        "model参数": "sambert-zhiru-v1",
+        "特色": "新闻女声",
+        "默认采样率（Hz）": "48k"
+      },
+      {
+        "音色": "知达",
+        "音频试听": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20230712/wfjx/知达.wav",
+        "model参数": "sambert-zhida-v1",
+        "特色": "标准男声",
+        "默认采样率（Hz）": "16k"
+      }
+    ]
+  },
+  {
+    "适用场景": "配音解说",
+    "音色列表": [
+      {
+        "音色": "知倩",
+        "音频试听": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20230712/trye/知倩.wav",
+        "model参数": "sambert-zhiqian-v1",
+        "特色": "资讯女声",
+        "默认采样率（Hz）": "48k"
+      },
+      {
+        "音色": "知祥",
+        "音频试听": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20230712/jdjf/知祥.wav",
+        "model参数": "sambert-zhixiang-v1",
+        "特色": "磁性男声",
+        "默认采样率（Hz）": "48k"
+      },
+      {
+        "音色": "知伦",
+        "音频试听": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20230713/lxag/知伦.wav",
+        "model参数": "sambert-zhilun-v1",
+        "特色": "悬疑解说",
+        "默认采样率（Hz）": "16k"
+      },
+      {
+        "音色": "知飞",
+        "音频试听": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20230713/bbqy/知飞.wav",
+        "model参数": "sambert-zhifei-v1",
+        "特色": "激昂解说",
+        "默认采样率（Hz）": "16k"
+      }
+    ]
+  },
+  {
+    "适用场景": "阅读产品简介",
+    "音色列表": [
+      {
+        "音色": "知薇",
+        "音频试听": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20230712/grnn/知薇.wav",
+        "model参数": "sambert-zhiwei-v1",
+        "特色": "萝莉女声",
+        "默认采样率（Hz）": "48k"
+      },
+      {
+        "音色": "知柜",
+        "音频试听": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20230713/ytij/知柜.wav",
+        "model参数": "sambert-zhigui-v1",
+        "特色": "直播女声",
+        "默认采样率（Hz）": "16k"
+      },
+      {
+        "音色": "知妙（多情感）",
+        "音频试听": [
+          "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20230713/vept/知妙.wav",
+          "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20230712/lyna/知妙_播报.wav"
+        ],
+        "model参数": "sambert-zhimiao-emo-v1",
+        "特色": "多种情感女声",
+        "默认采样率（Hz）": "16k"
+      }
+    ]
+  },
+  {
+    "适用场景": "客服",
+    "音色列表": [
+      {
+        "音色": "知悦",
+        "音频试听": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20230712/ejzf/知悦.wav",
+        "model参数": "sambert-zhiyue-v1",
+        "特色": "温柔女声",
+        "默认采样率（Hz）": "16k"
+      }
+    ]
+  },
+  {
+    "适用场景": "数字人",
+    "音色列表": [
+      {
+        "音色": "知硕",
+        "音频试听": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20230712/cxae/知硕.wav",
+        "model参数": "sambert-zhishuo-v1",
+        "特色": "自然男声",
+        "默认采样率（Hz）": "16k"
+      },
+      {
+        "音色": "知妙（多情感）",
+        "音频试听": [
+          "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20230713/vept/知妙.wav",
+          "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20230712/lyna/知妙_播报.wav"
+        ],
+        "model参数": "sambert-zhimiao-emo-v1",
+        "特色": "多种情感女声",
+        "默认采样率（Hz）": "16k"
+      }
+    ]
+  },
+  {
+    "适用场景": "直播",
+    "音色列表": [
+      {
+        "音色": "知猫",
+        "音频试听": "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20230712/vwtv/知猫.wav",
+        "model参数": "sambert-zhimao-v1",
+        "特色": "直播女声",
+        "默认采样率（Hz）": "16k"
+      },
+      {
+        "音色": "知妙（多情感）",
+        "音频试听": [
+          "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20230713/vept/知妙.wav",
+          "https://help-static-aliyun-doc.aliyuncs.com/file-manage-files/zh-CN/20230712/lyna/知妙_播报.wav"
+        ],
+        "model参数": "sambert-zhimiao-emo-v1",
+        "特色": "多种情感女声",
+        "默认采样率（Hz）": "16k"
+      }
+    ]
+  }
+]

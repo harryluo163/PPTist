@@ -37,6 +37,9 @@ export interface MainState {
   showNotesPanel: boolean
   showMarkupPanel: boolean
   showAIPPTDialog: boolean
+  showZMPanel: boolean
+  showAcousticPanel: boolean
+  AIZMpageVisible: boolean
 }
 
 const nanoid = customAlphabet('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz')
@@ -59,7 +62,7 @@ export const useMainStore = defineStore('main', {
     creatingElement: null, // 正在插入的元素信息，需要通过绘制插入的元素（文字、形状、线条）
     creatingCustomShape: false, // 正在绘制任意多边形
     toolbarState: ToolbarStates.SLIDE_DESIGN, // 右侧工具栏状态
-    clipingImageElementId: '', // 当前正在裁剪的图片ID  
+    clipingImageElementId: '', // 当前正在裁剪的图片ID
     richTextAttrs: defaultRichTextAttrs, // 富文本状态
     selectedTableCells: [], // 选中的表格单元格
     isScaling: false, // 正在进行元素缩放
@@ -73,6 +76,9 @@ export const useMainStore = defineStore('main', {
     showNotesPanel: false, // 打开批注面板
     showMarkupPanel: false, // 打开类型标注面板
     showAIPPTDialog: false, // 打开AIPPT创建窗口
+    showZMPanel: false, // 打开脚本目录
+    showAcousticPanel: false, // 打开音色目录
+    AIZMpageVisible: false,
   }),
 
   getters: {
@@ -82,7 +88,7 @@ export const useMainStore = defineStore('main', {
       if (!currentSlide || !currentSlide.elements) return []
       return currentSlide.elements.filter(element => state.activeElementIdList.includes(element.id))
     },
-  
+
     handleElement(state) {
       const slidesStore = useSlidesStore()
       const currentSlide = slidesStore.currentSlide
@@ -95,82 +101,82 @@ export const useMainStore = defineStore('main', {
     setActiveElementIdList(activeElementIdList: string[]) {
       if (activeElementIdList.length === 1) this.handleElementId = activeElementIdList[0]
       else this.handleElementId = ''
-      
+
       this.activeElementIdList = activeElementIdList
     },
-    
+
     setHandleElementId(handleElementId: string) {
       this.handleElementId = handleElementId
     },
-    
+
     setActiveGroupElementId(activeGroupElementId: string) {
       this.activeGroupElementId = activeGroupElementId
     },
-    
+
     setHiddenElementIdList(hiddenElementIdList: string[]) {
       this.hiddenElementIdList = hiddenElementIdList
     },
-  
+
     setCanvasPercentage(percentage: number) {
       this.canvasPercentage = percentage
     },
-  
+
     setCanvasScale(scale: number) {
       this.canvasScale = scale
     },
-  
+
     setCanvasDragged(isDragged: boolean) {
       this.canvasDragged = isDragged
     },
-  
+
     setThumbnailsFocus(isFocus: boolean) {
       this.thumbnailsFocus = isFocus
     },
-  
+
     setEditorareaFocus(isFocus: boolean) {
       this.editorAreaFocus = isFocus
     },
-  
+
     setDisableHotkeysState(disable: boolean) {
       this.disableHotkeys = disable
     },
-  
+
     setGridLineSize(size: number) {
       this.gridLineSize = size
     },
-  
+
     setRulerState(show: boolean) {
       this.showRuler = show
     },
-  
+
     setCreatingElement(element: CreatingElement | null) {
       this.creatingElement = element
     },
-  
+
     setCreatingCustomShapeState(state: boolean) {
       this.creatingCustomShape = state
     },
-  
+
     setToolbarState(toolbarState: ToolbarStates) {
       this.toolbarState = toolbarState
     },
-  
+
     setClipingImageElementId(elId: string) {
       this.clipingImageElementId = elId
     },
-  
+
     setRichtextAttrs(attrs: TextAttrs) {
       this.richTextAttrs = attrs
     },
-  
+
     setSelectedTableCells(cells: string[]) {
       this.selectedTableCells = cells
     },
-  
+
     setScalingState(isScaling: boolean) {
       this.isScaling = isScaling
     },
-    
+
     updateSelectedSlidesIndex(selectedSlidesIndex: number[]) {
       this.selectedSlidesIndex = selectedSlidesIndex
     },
@@ -205,6 +211,15 @@ export const useMainStore = defineStore('main', {
 
     setAIPPTDialogState(show: boolean) {
       this.showAIPPTDialog = show
+    },
+    setZMPanelState(show: boolean) {
+      this.showZMPanel = show
+    },
+    setAcousticPanelState(show: boolean) {
+      this.showAcousticPanel = show
+    },
+    setAIZMpageVisibleState(show: boolean) {
+      this.AIZMpageVisible = show
     },
   },
 })
