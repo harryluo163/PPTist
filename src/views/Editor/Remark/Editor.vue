@@ -82,14 +82,16 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, onUnmounted, ref, watch} from 'vue'
-import {debounce} from 'lodash'
-import {useMainStore, useSlidesStore} from '@/store'
-import type {EditorView} from 'prosemirror-view'
-import {initProsemirrorEditor, createDocument} from '@/utils/prosemirror'
-import {addMark, autoSelectAll, getTextAttrs, type TextAttrs} from '@/utils/prosemirror/utils'
-import {toggleList} from '@/utils/prosemirror/commands/toggleList'
-import tippy, {type Instance} from 'tippy.js'
+
+import { onMounted, onUnmounted, ref, useTemplateRef,watch } from 'vue'
+import { debounce } from 'lodash'
+import { useMainStore, useSlidesStore } from '@/store'
+import type { EditorView } from 'prosemirror-view'
+import { initProsemirrorEditor, createDocument } from '@/utils/prosemirror'
+import { addMark, autoSelectAll, getTextAttrs, type TextAttrs } from '@/utils/prosemirror/utils'
+import { toggleList } from '@/utils/prosemirror/commands/toggleList'
+import tippy, { type Instance } from 'tippy.js'
+
 
 import ColorPicker from '@/components/ColorPicker/index.vue'
 import Popover from '@/components/Popover.vue'
@@ -110,13 +112,13 @@ const emit = defineEmits<{
 const mainStore = useMainStore()
 const { AIZMpageVisible } = storeToRefs(mainStore)
 
-const editorViewRef = ref<HTMLElement>()
+const editorViewRef = useTemplateRef<HTMLElement>('editorViewRef')
 let editorView: EditorView
 
 const attr = ref<TextAttrs>()
 
 const menuInstance = ref<Instance>()
-const menuRef = ref<HTMLElement>()
+const menuRef = useTemplateRef<HTMLElement>('menuRef')
 
 watch(() => props.value, (newVal) => {
     if (newVal !== editorView.dom.innerHTML) {
@@ -299,8 +301,9 @@ onUnmounted(() => {
   display: flex;
   background-color: #fff;
   padding: 6px 4px;
+  border: 1px solid $borderColor;
+  box-shadow: $boxShadow;
   border-radius: $borderRadius;
-  box-shadow: 0 0 20px 0 rgba(0, 0, 0, .15);
 
   button {
     outline: 0;

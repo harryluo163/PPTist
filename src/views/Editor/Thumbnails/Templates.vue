@@ -39,7 +39,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, useTemplateRef } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useSlidesStore } from '@/store'
 import type { Slide } from '@/types/slides'
@@ -55,8 +55,9 @@ const emit = defineEmits<{
 
 const slidesStore = useSlidesStore()
 const { templates } = storeToRefs(slidesStore)
+
 const slides = ref<Slide[]>([])
-const listRef = ref<HTMLElement>()
+const listRef = useTemplateRef<HTMLElement>('listRef')
 const types = ref<{
   label: string
   value: string
@@ -82,7 +83,7 @@ const insertTemplates = (slides: Slide[]) => {
 
 const changeCatalog = (id: string) => {
   activeCatalog.value = id
-  api.getFileData(activeCatalog.value).then(ret => {
+  api.getMockData(activeCatalog.value).then(ret => {
     slides.value = ret.slides
 
     if (listRef.value) listRef.value.scrollTo(0, 0) 

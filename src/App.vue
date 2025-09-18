@@ -37,7 +37,7 @@ if (import.meta.env.MODE !== 'development') {
 }
 
 onMounted(async () => {
-  const slides = await api.getFileData('slides')
+  const slides = await api.getMockData('slides')
   slidesStore.setSlides(slides)
 
   await deleteDiscardedDB()
@@ -45,7 +45,7 @@ onMounted(async () => {
 })
 
 // 应用注销时向 localStorage 中记录下本次 indexedDB 的数据库ID，用于之后清除数据库
-window.addEventListener('unload', () => {
+window.addEventListener('beforeunload', () => {
   const discardedDB = localStorage.getItem(LOCALSTORAGE_KEY_DISCARDED_DB)
   const discardedDBList: string[] = discardedDB ? JSON.parse(discardedDB) : []
 

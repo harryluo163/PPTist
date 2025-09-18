@@ -107,12 +107,16 @@ export default () => {
     fontSize,
     fontFamily,
     width,
+    height,
+    lineHeight,
     maxLine,
   }: {
     text: string
     fontSize: number
     fontFamily: string
     width: number
+    height: number
+    lineHeight: number
     maxLine: number
   }) => {
     const canvas = document.createElement('canvas')
@@ -126,6 +130,11 @@ export default () => {
       const textWidth = context.measureText(text).width
       const line = Math.ceil(textWidth / width)
 
+      if (maxLine > 1 && height) {
+        const heightOfLine = Math.max(newFontSize, 16) * (newFontSize < 15 ? 1.2 : lineHeight) * 1.2
+        const totalHeight = line * heightOfLine
+        if (totalHeight <= height) return newFontSize
+      }
       if (line <= maxLine) return newFontSize
 
       const step = newFontSize <= 22 ? 1 : 2
@@ -169,6 +178,8 @@ export default () => {
     const padding = 10
     const width = el.width - padding * 2 - 2
 
+    const height = el.height - padding * 2 - 2
+    const lineHeight = el.type === 'text' ? (el.lineHeight || 1.5) : 1.2
     let content = el.type === 'text' ? el.content : el.text!.content
 
     const fontInfo = getFontInfo(content)
@@ -177,6 +188,8 @@ export default () => {
       fontSize: fontInfo.fontSize,
       fontFamily: fontInfo.fontFamily,
       width,
+      height,
+      lineHeight,
       maxLine,
     })
 
@@ -191,6 +204,11 @@ export default () => {
         firstTextNode.textContent = '0' + text
       }
       else firstTextNode.textContent = text
+
+      let node
+      while ((node = treeWalker.nextNode())) {
+        node.parentNode?.removeChild(node)
+      }
     }
 
     if (doc.body.innerHTML.indexOf('font-size') === -1) {

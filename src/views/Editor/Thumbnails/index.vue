@@ -35,6 +35,7 @@
             :data-section-id="element?.sectionTag?.id || ''"
             v-if="element.sectionTag || (hasSection && index === 0)" 
             v-contextmenu="contextmenusSection"
+            @dblclick="() => editSection(element?.sectionTag?.id || '')"
           >
             <input 
               :id="`section-title-input-${element?.sectionTag?.id || 'default'}`" 
@@ -73,7 +74,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch, useTemplateRef } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useMainStore, useSlidesStore, useKeyboardStore } from '@/store'
 import { fillDigit } from '@/utils/common'
@@ -132,7 +133,7 @@ const {
 } = useSectionHandler()
 
 // 页面被切换时
-const thumbnailsRef = ref<InstanceType<typeof Draggable>>()
+const thumbnailsRef = useTemplateRef<InstanceType<typeof Draggable>>('thumbnailsRef')
 watch(() => slideIndex.value, () => {
 
   // 清除多选状态的幻灯片

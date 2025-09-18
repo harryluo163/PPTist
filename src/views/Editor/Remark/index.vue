@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, ref, watch } from 'vue'
+import {computed, nextTick, ref, useTemplateRef, watch} from 'vue'
 import { storeToRefs } from 'pinia'
 import { useSlidesStore } from '@/store'
 

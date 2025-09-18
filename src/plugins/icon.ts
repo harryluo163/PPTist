@@ -121,6 +121,7 @@ import {
   HamburgerButton,
   Attention,
   CheckOne,
+  Check,
   CloseOne,
   Info,
   Comment,
@@ -128,7 +129,16 @@ import {
   Switch,
   More,
   AlignTextBothOne,
-  Acoustic
+  Acoustic,
+  FilePdf,
+  FileJpg,
+  Notes,
+  Refresh,
+  Helpcenter,
+  Mark,
+  Command,
+  SlideTwo,
+  Symbol,
 } from '@icon-park/vue-next'
 
 export interface Icons {
@@ -256,13 +266,23 @@ export const icons: Icons = {
   IconAttention: Attention,
   IconCheckOne: CheckOne,
   IconCloseOne: CloseOne,
+  IconCheck: Check,
   IconInfo: Info,
   IconComment: Comment,
   IconUser: User,
   IconSwitch: Switch,
   IconMore: More,
   IconAlignTextBothOne: AlignTextBothOne,
-  IconAcoustic:Acoustic
+  IconAcoustic:Acoustic,
+  IconFilePdf: FilePdf,
+  IconFileJpg: FileJpg,
+  IconNotes: Notes,
+  IconRefresh: Refresh,
+  IconHelpcenter: Helpcenter,
+  IconMark: Mark,
+  IconCommand: Command,
+  IconSlideTwo: SlideTwo,
+  IconSymbol: Symbol,
 }
 
 export default {

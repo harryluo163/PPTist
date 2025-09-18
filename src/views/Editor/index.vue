@@ -23,6 +23,7 @@
   <SearchPanel v-if="showSearchPanel" />
   <NotesPanel v-if="showNotesPanel" />
   <MarkupPanel v-if="showMarkupPanel" />
+  <SymbolPanel v-if="showSymbolPanel" />
 
   <Modal
     :visible="!!dialogForExport"
@@ -84,6 +85,7 @@ import ExportDialog from './ExportDialog/index.vue'
 import SelectPanel from './SelectPanel.vue'
 import SearchPanel from './SearchPanel.vue'
 import NotesPanel from './NotesPanel.vue'
+import SymbolPanel from './SymbolPanel.vue'
 import MarkupPanel from './MarkupPanel.vue'
 import AIPPTDialog from './AIPPTDialog.vue'
 import Modal from '@/components/Modal.vue'
@@ -93,9 +95,13 @@ import AIZMDialog from './ZM/AIZMDialog.vue'
 import FullscreenSpin from "@/components/FullscreenSpin.vue";
 import {useMP4Store} from "@/store/mp4";
 const mainStore = useMainStore()
+
 const mp4Store = useMP4Store();
-const { dialogForExport, showSelectPanel, showSearchPanel, showNotesPanel, showMarkupPanel, showAIPPTDialog,showZMPanel,showAcousticPanel, AIZMpageVisible } = storeToRefs(mainStore)
+const { dialogForExport, showSelectPanel, showSearchPanel, showNotesPanel, showSymbolPanel, showMarkupPanel, showAIPPTDialog,showZMPanel,showAcousticPanel, AIZMpageVisible } = storeToRefs(mainStore)
 const { ttId,aiLoading } = storeToRefs(mp4Store)
+
+
+
 const closeExportDialog = () => mainStore.setDialogForExport('')
 const closeAIPPTDialog = () => mainStore.setAIPPTDialogState(false)
 const closeAcousticPanel = () => mainStore.setAcousticPanelState(false)

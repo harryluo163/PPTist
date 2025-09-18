@@ -41,7 +41,7 @@
       </div>
     </div>
     <div class="btns">
-      <Button class="btn export" type="primary" @click="exportPPTX(selectedSlides, masterOverwrite, ignoreMedia)">导出 PPTX</Button>
+      <Button class="btn export" type="primary" @click="exportPPTX(selectedSlides, masterOverwrite, ignoreMedia)"><IconDownload /> 导出 PPTX</Button>
       <Button class="btn close" @click="emit('close')">关闭</Button>
     </div>
 
@@ -97,7 +97,7 @@ const selectedSlides = computed(() => {
 }
 .configs {
   width: 350px;
-  height: calc(100% - 100px);
+  height: calc(100% - 80px);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -133,7 +133,7 @@ const selectedSlides = computed(() => {
 }
 .btns {
   width: 300px;
-  height: 100px;
+  height: 80px;
   display: flex;
   justify-content: center;
   align-items: center;

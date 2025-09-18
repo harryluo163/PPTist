@@ -8,11 +8,11 @@
         :key="item.label"
         @click="updateTurningMode(item.value)"
       >
-        <div :class="['animation-block', item.value]"></div>
+        <div :class="['animation-block', item.value]">P</div>
         <div class="animation-text">{{item.label}}</div>
       </div>
     </div>
-    <Button style="width: 100%;" @click="applyAllSlide()">应用到全部</Button>
+    <Button style="width: 100%;" @click="applyAllSlide()"><IconCheck /> 应用到全部</Button>
   </div>
 </template>
 
@@ -77,6 +77,7 @@ const applyAllSlide = () => {
 
   &.active {
     border-color: $themeColor;
+    background-color: rgba($color: $themeColor, $alpha: .05);
     z-index: 1;
   }
 
@@ -93,6 +94,10 @@ const applyAllSlide = () => {
   background: #666;
   position: relative;
   overflow: hidden;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
   @mixin elAnimation($animationType) {
     content: 'PPTist';
@@ -101,7 +106,7 @@ const applyAllSlide = () => {
     position: absolute;
     left: 0;
     top: 0;
-    background-color: rgba($color: $themeColor, $alpha: .75);
+    background-color: $themeColor;
     color: #fff;
     display: flex;
     justify-content: center;

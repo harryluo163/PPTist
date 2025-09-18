@@ -12,15 +12,20 @@
     <template v-if="title">
       <div class="header" @mousedown="$event => startMove($event)">
         <div class="title">{{title}}</div>
-        <div class="close-btn" @click="emit('close')"><IconClose /></div>
+        <div class="close-btn" @mousedown.stop @click="emit('close')"><IconClose /></div>
       </div>
 
-      <div class="content">
+      <div class="content" :style="contentStyle || {}">
         <slot></slot>
       </div>
     </template>
 
-    <div v-else class="content" @mousedown="$event => startMove($event)">
+    <div
+      class="content" 
+      :style="contentStyle || {}" 
+      @mousedown="$event => startMove($event)"
+      v-else
+    >
       <slot></slot>
     </div>
 
@@ -29,7 +34,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, useTemplateRef, type CSSProperties } from 'vue'
 
 const props = withDefaults(defineProps<{
   width: number
@@ -43,6 +48,7 @@ const props = withDefaults(defineProps<{
   title?: string
   moveable?: boolean
   resizeable?: boolean
+  contentStyle?: CSSProperties
 }>(), {
   minWidth: 20,
   minHeight: 20,
@@ -63,7 +69,7 @@ const x = ref(0)
 const y = ref(0)
 const w = ref(0)
 const h = ref(0)
-const moveablePanelRef = ref<HTMLElement>()
+const moveablePanelRef = useTemplateRef<HTMLElement>('moveablePanelRef')
 const realHeight = computed(() => {
   if (!h.value) {
     return moveablePanelRef.value?.clientHeight || 0
@@ -211,6 +217,10 @@ const startResize = (e: MouseEvent) => {
   color: #666;
   font-size: 13px;
   cursor: pointer;
+
+  &:hover {
+    color: $themeColor;
+  }
 }
 .content {
   flex: 1;

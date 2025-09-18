@@ -149,9 +149,16 @@ export default () => {
         }
         else if (el.type === 'chart') {
           if (el.fill) {
-            themeColorValues.push({ area: area * 0.5, value: el.fill })
+            themeColorValues.push({ area: area * 0.6, value: el.fill })
           }
-          themeColorValues.push({ area: area * 0.5, value: el.themeColors[0] })
+          if (el.themeColors[0]) {
+            themeColorValues.push({ area: area * 0.3, value: el.themeColors[0] })
+          }
+          for (const color of el.themeColors) {
+            if (tinycolor(color).getAlpha() !== 0) {
+              themeColorValues.push({ area: area / el.themeColors.length * 0.1, value: color })
+            }
+          }
         }
         else if (el.type === 'line') {
           themeColorValues.push({ area, value: el.color })
@@ -230,8 +237,14 @@ export default () => {
       if (el.type === 'table' && el.theme && tinycolor(el.theme.color).getAlpha() !== 0) {
         record(el.theme.color, area)
       }
-      if (el.type === 'chart' && el.themeColors[0] && tinycolor(el.themeColors[0]).getAlpha() !== 0) {
-        record(el.themeColors[0], area)
+      if (el.type === 'chart') {
+        for (const color of el.themeColors) {
+          if (tinycolor(color).getAlpha() !== 0) {
+            record(color, area / el.themeColors.length * 0.1)
+          }
+        }
+        if (el.themeColors[0] && tinycolor(el.themeColors[0]).getAlpha() !== 0) record(el.themeColors[0], area * 0.3)
+        if (el.fill && tinycolor(el.fill).getAlpha() !== 0) record(el.fill, area * 0.6)
       }
       if (el.type === 'line' && tinycolor(el.color).getAlpha() !== 0) {
         record(el.color, area)
@@ -285,14 +298,14 @@ export default () => {
         if (el.text) {
           el.text.defaultColor = theme.fontColor
           el.text.defaultFontName = theme.fontname
-          if(el.text.content) el.text.content = el.text.content.replace(/color: .+?;/g, '').replace(/font-family: .+?;/g, '')
+          if (el.text.content) el.text.content = el.text.content.replace(/color: .+?;/g, '').replace(/font-family: .+?;/g, '')
         }
       }
       if (el.type === 'text') {
         if (el.fill) el.fill = getColor(el.fill)
         el.defaultColor = theme.fontColor
         el.defaultFontName = theme.fontname
-        if(el.content) el.content = el.content.replace(/color: .+?;/g, '').replace(/font-family: .+?;/g, '')
+        if (el.content) el.content = el.content.replace(/color: .+?;/g, '').replace(/font-family: .+?;/g, '')
       }
       if (el.type === 'image' && el.colorMask) {
         el.colorMask = getColor(el.colorMask)
@@ -309,7 +322,7 @@ export default () => {
         }
       }
       if (el.type === 'chart') {
-        el.themeColors = getColor(el.themeColors[0]) ? [getColor(el.themeColors[0])] : el.themeColors
+        el.themeColors = [...theme.colors]
         el.textColor = theme.fontColor
       }
       if (el.type === 'line') el.color = getColor(el.color)
@@ -317,7 +330,11 @@ export default () => {
       if (el.type === 'latex') el.color = theme.fontColor
 
       if ('outline' in el && el.outline) {
-        el.outline.color = theme.borderColor
+        if (theme.outline) el.outline = { ...theme.outline }
+        if (theme.borderColor) el.outline.color = theme.borderColor
+      }
+      if ('shadow' in el && el.shadow && theme.shadow) {
+        el.shadow = theme.shadow
       }
     }
   }
@@ -349,60 +366,19 @@ export default () => {
   // 将当前主题配置应用到全部页面
   const applyThemeToAllSlides = (applyAll = false) => {
     const newSlides: Slide[] = JSON.parse(JSON.stringify(slides.value))
-    const { themeColors, backgroundColor, fontColor, fontName, outline, shadow } = theme.value
+
+    const _theme: PresetTheme = {
+      background: theme.value.backgroundColor,
+      fontColor: theme.value.fontColor,
+      borderColor: applyAll ? theme.value.outline.color : undefined,
+      fontname: theme.value.fontName,
+      colors: theme.value.themeColors,
+      outline: applyAll ? theme.value.outline : undefined,
+      shadow: applyAll ? theme.value.shadow : undefined,
+    }
   
     for (const slide of newSlides) {
-      if (!slide.background || slide.background.type !== 'image') {
-        slide.background = {
-          type: 'solid',
-          color: backgroundColor
-        }
-      }
-  
-      for (const el of slide.elements) {
-        if (applyAll) {
-          if ('outline' in el && el.outline) el.outline = outline
-          if ('shadow' in el && el.shadow) el.shadow = shadow
-        }
-
-        if (el.type === 'shape') {
-          const alpha = tinycolor(el.fill).getAlpha()
-          if (alpha > 0) el.fill = themeColors[0]
-          if (el.text) {
-            el.text.defaultColor = fontColor
-            el.text.defaultFontName = fontName
-            if(el.text.content) el.text.content = el.text.content.replace(/color: .+?;/g, '').replace(/font-family: .+?;/g, '')
-          }
-          if (el.gradient) delete el.gradient
-        }
-        else if (el.type === 'line') el.color = themeColors[0]
-        else if (el.type === 'text') {
-          if (el.fill) {
-            const alpha = tinycolor(el.fill).getAlpha()
-            if (alpha > 0) el.fill = themeColors[0]
-          }
-          el.defaultColor = fontColor
-          el.defaultFontName = fontName
-          if(el.content) el.content = el.content.replace(/color: .+?;/g, '').replace(/font-family: .+?;/g, '')
-        }
-        else if (el.type === 'table') {
-          if (el.theme) el.theme.color = themeColors[0]
-          for (const rowCells of el.data) {
-            for (const cell of rowCells) {
-              if (cell.style) {
-                cell.style.color = fontColor
-                cell.style.fontname = fontName
-              }
-            }
-          }
-        }
-        else if (el.type === 'chart') {
-          el.themeColors = themeColors
-          el.textColor = fontColor
-        }
-        else if (el.type === 'latex') el.color = fontColor
-        else if (el.type === 'audio') el.color = themeColors[0]
-      }
+      setSlideTheme(slide, _theme)
     }
     slidesStore.setSlides(newSlides)
     addHistorySnapshot()

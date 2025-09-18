@@ -738,7 +738,14 @@ export default () => {
 
   // 导出pptist文件（特有 .pptist 后缀文件）
   const exportSpecificFile = (_slides: Slide[]) => {
-    const blob = new Blob([encrypt(JSON.stringify(_slides))], { type: '' })
+    const json = {
+      title: title.value,
+      width: viewportSize.value,
+      height: viewportSize.value * viewportRatio.value,
+      theme: theme.value,
+      slides: _slides,
+    }
+    const blob = new Blob([encrypt(JSON.stringify(json))], { type: '' })
     saveAs(blob, `${title.value}.pptist`)
   }
 
@@ -757,9 +764,11 @@ export default () => {
 
   // 格式化颜色值为 透明度 + HexString，供pptxgenjs使用
   const formatColor = (_color: string) => {
-    if (!_color) return {
-      alpha: 0,
-      color: '#000000',
+    if (!_color) {
+      return {
+        alpha: 0,
+        color: '#000000',
+      }
     }
 
     const c = tinycolor(_color)

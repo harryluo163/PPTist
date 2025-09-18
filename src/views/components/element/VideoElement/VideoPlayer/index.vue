@@ -13,6 +13,7 @@
     <div class="video-wrap" @click="toggle()">
       <div class="load-error" v-if="loadError">视频加载失败</div>
 
+      <canvas ref="bgCanvasRef" class="bg-canvas"></canvas>
       <video
         class="video"
         ref="videoRef"
@@ -21,6 +22,7 @@
         :poster="poster"
         webkit-playsinline
         playsinline
+        crossOrigin="anonymous"
         @durationchange="handleDurationchange()"
         @timeupdate="handleTimeupdate()"
         @ended="handleEnded()"
@@ -96,7 +98,7 @@
 
       <div 
         class="bar-wrap"
-        ref="playBarWrap"
+        ref="playBarWrapRef"
         @mousedown="handleMousedownPlayBar()"
         @touchstart="handleMousedownPlayBar()"
         @mousemove="$event => handleMousemovePlayBar($event)"
@@ -116,7 +118,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { computed, ref, useTemplateRef, onMounted } from 'vue'
 import useMSE from './useMSE'
 
 const props = withDefaults(defineProps<{
@@ -146,9 +148,9 @@ const getBoundingClientRectViewLeft = (element: HTMLElement) => {
   return element.getBoundingClientRect().left
 }
 
-const videoRef = ref<HTMLVideoElement>()
-const playBarWrap = ref<HTMLElement>()
-const volumeBarRef = ref<HTMLElement>()
+const videoRef = useTemplateRef<HTMLVideoElement>('videoRef')
+const playBarWrapRef = useTemplateRef<HTMLElement>('playBarWrapRef')
+const volumeBarRef = useTemplateRef<HTMLElement>('volumeBarRef')
 
 const volume = ref(0.5)
 const paused = ref(true)
@@ -250,9 +252,9 @@ const loadError = ref(false)
 const handleError = () => loadError.value = true
 
 const thumbMove = (e: MouseEvent | TouchEvent) => {
-  if (!videoRef.value || !playBarWrap.value) return
+  if (!videoRef.value || !playBarWrapRef.value) return
   const clientX = 'clientX' in e ? e.clientX : e.changedTouches[0].clientX
-  let percentage = (clientX - getBoundingClientRectViewLeft(playBarWrap.value)) / playBarWrap.value.clientWidth
+  let percentage = (clientX - getBoundingClientRectViewLeft(playBarWrapRef.value)) / playBarWrapRef.value.clientWidth
   percentage = Math.max(percentage, 0)
   percentage = Math.min(percentage, 1)
   const time = percentage * duration.value
@@ -262,10 +264,10 @@ const thumbMove = (e: MouseEvent | TouchEvent) => {
 }
 
 const thumbUp = (e: MouseEvent | TouchEvent) => {
-  if (!videoRef.value || !playBarWrap.value) return
+  if (!videoRef.value || !playBarWrapRef.value) return
 
   const clientX = 'clientX' in e ? e.clientX : e.changedTouches[0].clientX
-  let percentage = (clientX - getBoundingClientRectViewLeft(playBarWrap.value)) / playBarWrap.value.clientWidth
+  let percentage = (clientX - getBoundingClientRectViewLeft(playBarWrapRef.value)) / playBarWrapRef.value.clientWidth
   percentage = Math.max(percentage, 0)
   percentage = Math.min(percentage, 1)
   const time = percentage * duration.value
@@ -314,12 +316,12 @@ const handleClickVolumeBar = (e: MouseEvent) => {
 }
 
 const handleMousemovePlayBar = (e: MouseEvent) => {
-  if (duration.value && playBarWrap.value) {
-    const px = playBarWrap.value.getBoundingClientRect().left
+  if (duration.value && playBarWrapRef.value) {
+    const px = playBarWrapRef.value.getBoundingClientRect().left
     const tx = e.clientX - px
-    if (tx < 0 || tx > playBarWrap.value.offsetWidth) return
+    if (tx < 0 || tx > playBarWrapRef.value.offsetWidth) return
 
-    const time = duration.value * (tx / playBarWrap.value.offsetWidth)
+    const time = duration.value * (tx / playBarWrapRef.value.offsetWidth)
     playBarTimeLeft.value = `${tx - (time >= 3600 ? 25 : 20)}px`
     playBarTime.value = secondToTime(time)
     playBarTimeVisible.value = true
@@ -353,6 +355,19 @@ const autoHideController = () => {
   }, 3000)
 }
 
+const bgCanvasRef = useTemplateRef<HTMLCanvasElement>('bgCanvasRef')
+onMounted(() => {
+  if (!bgCanvasRef.value || !videoRef.value) return
+  const ctx = bgCanvasRef.value.getContext('2d')
+  if (!ctx) return
+
+  videoRef.value.addEventListener('loadedmetadata', () => {
+    videoRef.value!.requestVideoFrameCallback(() => {
+      ctx.drawImage(videoRef.value!, 0, 0, bgCanvasRef.value!.width, bgCanvasRef.value!.height)
+    })
+  }, { once: true })
+})
+
 useMSE(props.src, videoRef)
 </script>
 
@@ -379,15 +394,41 @@ useMSE(props.src, videoRef)
 }
 
 .video-wrap {
+  width: 100%;
+  height: 100%;
   position: relative;
   background: #000;
   font-size: 0;
-  width: 100%;
-  height: 100%;
 
+  .bg-canvas {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    transform: scale(1.1);
+    filter: blur(25px) brightness(0.7);
+  }
   .video {
     width: 100%;
     height: 100%;
+    position: relative;
+    z-index: 2;
+  }
+  .load-error {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 3;
+    font-size: 15px;
+    color: #fff;
+    pointer-events: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 }
 
@@ -397,6 +438,7 @@ useMSE(props.src, videoRef)
   width: 100%;
   position: absolute;
   bottom: 0;
+  z-index: 1000;
   transition: all 0.3s ease;
 }
 .controller {
@@ -404,6 +446,7 @@ useMSE(props.src, videoRef)
   bottom: 0;
   left: 0;
   right: 0;
+  z-index: 1000;
   height: 41px;
   padding: 0 20px;
   user-select: none;
@@ -642,6 +685,7 @@ useMSE(props.src, videoRef)
   font-size: 22px;
   color: #fff;
   pointer-events: none;
+  z-index: 3;
 
   .bezel-icon {
     position: absolute;
@@ -675,19 +719,5 @@ useMSE(props.src, videoRef)
       }
     }
   }
-}
-
-.load-error {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  font-size: 15px;
-  color: #fff;
-  pointer-events: none;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 </style>
