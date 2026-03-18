@@ -35,7 +35,7 @@
 
   <Modal
     :visible="showAIPPTDialog"
-    :width="720"
+    :width="553"
     :closeOnClickMask="false"
     :closeOnEsc="false"
     closeButton

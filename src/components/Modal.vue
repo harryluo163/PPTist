@@ -49,6 +49,7 @@ const contentVisible = ref(false)
 const contentStyle = computed(() => {
   return {
     width: props.width + 'px',
+      'max-height': '90%',
     ...(props.contentStyle || {})
   }
 })

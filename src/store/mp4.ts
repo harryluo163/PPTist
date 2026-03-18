@@ -4,6 +4,7 @@ import { ACOUSTICS } from "@/configs/Acoustic";
 export const useMP4Store = defineStore('MP4', {
   state: () => ({
     resultArray: [],
+    errimage:"",
     zm: "", // 字幕内容,
     isGenerating: false, // 新增：加载状态
     audio:"",
@@ -57,6 +58,9 @@ export const useMP4Store = defineStore('MP4', {
 
     updateVideo(fileUrl) {
       this.video = fileUrl
+    },
+    updateErrimage(err) {
+      this.errimage = err
     },
     clearVideo() {
       this.video = "";

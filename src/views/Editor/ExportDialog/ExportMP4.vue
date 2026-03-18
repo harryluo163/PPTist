@@ -118,8 +118,9 @@
 
                 <div class="row" v-if="resultArray.length>0">
                     <div class="title">已上传幻灯片：</div>
-                    <span class="config-item">{{ resultArray.length }}/{{slides.length}}页</span>
-<!--                    <span class="config-item" @click="setDialogForExport('image')"> <a href="javascript:void(0)" >导出图片</a></span>-->
+                    <span class="config-item"  style="    white-space: nowrap;">{{ resultArray.length }}/{{slides.length}}页</span>
+                    <span style="color: red;margin-left: 2px"> {{MP4Store.errimage}} </span>
+
                 </div>
 
                 <div class="row" v-if="audio">

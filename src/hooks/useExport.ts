@@ -97,7 +97,8 @@ export default () => {
         width: 1600,
         ...(ignoreWebfont ? { fontEmbedCSS: '' } : {})
       })
-          .then(dataUrl => fetch(dataUrl).then(res => res.blob()))
+          .then(dataUrl =>
+              fetch(dataUrl).then(res => res.blob()))
           .then(blob => {
             const formData = new FormData();
             formData.append('file', blob, filename);
@@ -136,10 +137,39 @@ export default () => {
 
     const timestamp = Date.now();
     //上传图片
+    MP4Store.updateErrimage(``);
     const data = await uploadImage(domRef, format, quality, ignoreWebfont, timestamp);
+    if(resultArray.value.length !=slides.value.length){
+      // 假设 slides.value 是一个数组，表示 PPT 的所有幻灯片
+      const totalSlides = slides.value.length; // 根据你的描述：PPT 有 slides.value.length - 1 页
+      // 从 resultArray.value 中提取已上传的页码
+      const uploadedPageNumbers = resultArray.value
+          .map(item => {
+            const match = item.image.match(/-(\d+)\.jpeg$/);
+            return match ? parseInt(match[1], 10) : -1;
+          })
+          .filter(page => page >= 0); // 过滤无效页码
+      // 构建完整的页码集合（从 0 到 totalSlides - 1）
+      const allPages = Array.from({ length: totalSlides }, (_, i) => i);
+      // 找出缺失的页码
+      const missingPages = allPages.filter(page => !uploadedPageNumbers.includes(page));
+      // 格式化为“第X页、第Y页”形式（页码 +1 转为人类可读的“第几页”）
+      const formattedMissing = missingPages
+          .map(page => `第${page + 1}页`)
+          .join('、');
 
-    //发送字幕生成音频
-    await exportAudiozm(timestamp)
+      if (formattedMissing) {
+        console.log('缺失的页码:', formattedMissing);
+        MP4Store.updateErrimage(`${formattedMissing},解析失败，请重新生成视频`);
+      }
+
+
+      //重新上传
+    }else{
+      //发送字幕生成音频
+      await exportAudiozm(timestamp)
+    }
+
 
     // await exportVideo( '1757574647654');
 
