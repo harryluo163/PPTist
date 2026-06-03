@@ -115,17 +115,19 @@
 
                 </div>
 
+                <div class="row" style="display: none">
+                    <div class="title">数字人小睦：</div>
+                    <div class="config-item">
+                        <Switch v-model:value="MP4Store.enableCharacter" v-tooltip="'开启数字人形象'" />
+                    </div>
+                </div>
+
 
                 <div class="row" v-if="resultArray.length>0">
                     <div class="title">已上传幻灯片：</div>
                     <span class="config-item"  style="    white-space: nowrap;">{{ resultArray.length }}/{{slides.length}}页</span>
                     <span style="color: red;margin-left: 2px"> {{MP4Store.errimage}} </span>
 
-                </div>
-
-                <div class="row" v-if="audio">
-                    <div class="title">语音下载：</div>
-                    <span class="config-item"><a :href="audio" target="_blank">音频下载</a></span>
                 </div>
                 <div class="row" v-if="MP4Store.isGenerating_video||video!=''">
                     <div class="title" v-if="video">视&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp频：</div>
@@ -156,7 +158,11 @@
                 </div>
                 <div class="btns">
                     <Button class="btn export" type="primary" @click="expImage()" v-if="!zm">导出视频</Button>
-                    <Button class="btn close" @click="handleClose">关闭</Button>
+                    <Button class="btn tasks" @click="openVideoTaskList">
+
+                        我的视频任务
+                    </Button>
+
                 </div>
             </div>
 
@@ -191,6 +197,7 @@ import OutlineEditor from "@/components/OutlineEditor.vue";
 import alibb_audio from '@/assets/alibb_audio.json';
 import Select from "@/components/Select.vue";
 import {ACOUSTICS} from "@/configs/Acoustic";
+import message from '@/utils/message';
 
 const subtitle = ref('')
 const subtitleCreating = ref(false)
@@ -299,9 +306,11 @@ const expImage = async () => {
     exporting.value = true
     try {
         await exportMP4(imageThumbnailsRef.value, format.value, quality.value, ignoreWebfont.value, email.value)
-        // 导出成功后可以清空预览或显示成功消息
+        // 导出成功后提示用户到任务列表查看和下载
+        message.success('视频任务已提交，请点击"我的视频任务"查看进度和下载')
     } catch (error) {
         console.error('导出失败:', error)
+        message.error('导出失败，请重试')
     } finally {
         exporting.value = false
     }
@@ -330,6 +339,11 @@ const handleAIZM = () => {
 const toggleSelectAcousticPanel = () => {
     mainStore.setAcousticPanelState(true)
 }
+
+const openVideoTaskList = () => {
+    mainStore.setVideoTaskListState(true)
+}
+
 const setDialogForExport = (type: DialogForExportTypes) => {
     mainStore.setDialogForExport(type)
 }
@@ -402,16 +416,34 @@ const setDialogForExport = (type: DialogForExportTypes) => {
     }
 }
 .btns {
-    width: 300px;
+    width: 400px;
     height: 100px;
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1;
+    gap: 8px;
 
     .export {
         flex: 1;
     }
+
+    .tasks {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 12px;
+        padding: 0 12px;
+        border: 1px solid #d9d9d9;
+        background: #fff;
+        color: #666;
+
+        &:hover {
+            border-color: #40a9ff;
+            color: #1890ff;
+        }
+    }
+
     .close {
         width: 100px;
         margin-left: 10px;

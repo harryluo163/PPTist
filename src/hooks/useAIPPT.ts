@@ -333,20 +333,24 @@ export default () => {
       }
       else if (template.type === 'contents') {
         const items = template.data.items
-        if (items.length === 11) {
-          const items1 = items.slice(0, 6)
-          const items2 = items.slice(6)
-          AISlides.push({ ...template, data: { ...template.data, items: items1 } })
-          AISlides.push({ ...template, data: { ...template.data, items: items2 }, offset: 6 })
-        }
-        else if (items.length > 11) {
-          const items1 = items.slice(0, 10)
-          const items2 = items.slice(10)
-          AISlides.push({ ...template, data: { ...template.data, items: items1 } })
-          AISlides.push({ ...template, data: { ...template.data, items: items2 }, offset: 10 })
+        const maxItemsPerPage = 6
+
+        if (items.length <= maxItemsPerPage) {
+          AISlides.push(template)
         }
         else {
-          AISlides.push(template)
+          // 按每页最多6个item分页，确保每页都能找到匹配的模板
+          const pageCount = Math.ceil(items.length / maxItemsPerPage)
+          for (let i = 0; i < pageCount; i++) {
+            const startIndex = i * maxItemsPerPage
+            const endIndex = Math.min(startIndex + maxItemsPerPage, items.length)
+            const pageItems = items.slice(startIndex, endIndex)
+            AISlides.push({
+              ...template,
+              data: { ...template.data, items: pageItems },
+              offset: startIndex
+            })
+          }
         }
       }
       else AISlides.push(template)
@@ -469,6 +473,10 @@ export default () => {
       }
       else if (item.type === 'transition') {
         transitionIndex.value = transitionIndex.value + 1
+        if (!transitionTemplate.value) {
+          // 没有可用的过渡模板，跳过此页
+          continue
+        }
         const elements = transitionTemplate.value.elements.map(el => {
           if (el.type === 'image' && el.imageType && imgPool.value.length) return getNewImgElement(el)
           if (el.type !== 'text' && el.type !== 'shape') return el

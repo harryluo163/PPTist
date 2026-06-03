@@ -8,6 +8,7 @@ interface AIPPTOutlinePayload {
   content: string
   language: string
   model: string
+  pageRange?: string
 }
 
 interface AIPPTPayload {
@@ -15,6 +16,8 @@ interface AIPPTPayload {
   language: string
   style: string
   model: string
+  originalInput?: string
+  pageRange?: string
 }
 
 interface AIWritingPayload {
@@ -36,6 +39,7 @@ export default {
     content,
     language,
     model,
+    pageRange,
   }: AIPPTOutlinePayload): Promise<any> {
     return fetch(`${SERVER_URL}/tools/aippt_outline`, {
       method: 'POST',
@@ -47,6 +51,7 @@ export default {
         language,
         model,
         stream: true,
+        ...(pageRange ? { pageRange } : {}),
       }),
     })
   },
@@ -56,6 +61,8 @@ export default {
     language,
     style,
     model,
+    originalInput,
+    pageRange,
   }: AIPPTPayload): Promise<any> {
     return fetch(`${SERVER_URL}/tools/aippt`, {
       method: 'POST',
@@ -68,6 +75,8 @@ export default {
         model,
         style,
         stream: true,
+        ...(originalInput ? { originalInput } : {}),
+        ...(pageRange ? { pageRange } : {}),
       }),
     })
   },

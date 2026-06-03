@@ -64,6 +64,18 @@
         <AIZMDialog />
 
     </Modal>
+    
+    <Modal
+            :visible="showVideoTaskList"
+            :width="800"
+            :closeOnClickMask="false"
+            :closeOnEsc="false"
+            closeButton
+            @closed="closeVideoTaskList()"
+    >
+        <VideoTaskList @close="closeVideoTaskList()" />
+    </Modal>
+    
     <FullscreenSpin :loading="aiLoading" tip="导出中，请耐心等待 ..." :mask="false"/>
 </template>
 
@@ -92,12 +104,13 @@ import Modal from '@/components/Modal.vue'
 import AcousticDialog from './AcousticDialog.vue'
 import Button from "@/components/Button.vue";
 import AIZMDialog from './ZM/AIZMDialog.vue'
+import VideoTaskList from './VideoTaskList.vue'
 import FullscreenSpin from "@/components/FullscreenSpin.vue";
 import {useMP4Store} from "@/store/mp4";
 const mainStore = useMainStore()
 
 const mp4Store = useMP4Store();
-const { dialogForExport, showSelectPanel, showSearchPanel, showNotesPanel, showSymbolPanel, showMarkupPanel, showAIPPTDialog,showZMPanel,showAcousticPanel, AIZMpageVisible } = storeToRefs(mainStore)
+const { dialogForExport, showSelectPanel, showSearchPanel, showNotesPanel, showSymbolPanel, showMarkupPanel, showAIPPTDialog,showZMPanel,showAcousticPanel, AIZMpageVisible, showVideoTaskList } = storeToRefs(mainStore)
 const { ttId,aiLoading } = storeToRefs(mp4Store)
 
 
@@ -106,6 +119,7 @@ const closeExportDialog = () => mainStore.setDialogForExport('')
 const closeAIPPTDialog = () => mainStore.setAIPPTDialogState(false)
 const closeAcousticPanel = () => mainStore.setAcousticPanelState(false)
 const closAIZMpageVisible = () => mainStore.setAIZMpageVisibleState(false)
+const closeVideoTaskList = () => mainStore.setVideoTaskListState(false)
 const remarkHeight = ref(180)
 
 useGlobalHotkey()

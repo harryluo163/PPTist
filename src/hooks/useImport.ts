@@ -249,7 +249,7 @@ export default () => {
   const importPPTXFile = (files: FileList, options?: { cover?: boolean; fixedViewport?: boolean }) => {
     const defaultOptions = {
       cover: false,
-      fixedViewport: false, 
+      fixedViewport: true , 
     }
     const { cover, fixedViewport } = { ...defaultOptions, ...options }
 

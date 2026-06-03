@@ -41,6 +41,7 @@ export interface MainState {
   showZMPanel: boolean
   showAcousticPanel: boolean
   AIZMpageVisible: boolean
+  showVideoTaskList: boolean
 }
 
 const nanoid = customAlphabet('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz')
@@ -81,6 +82,7 @@ export const useMainStore = defineStore('main', {
     showZMPanel: false, // 打开脚本目录
     showAcousticPanel: false, // 打开音色目录
     AIZMpageVisible: false,
+    showVideoTaskList: false, // 打开视频任务列表
   }),
 
   getters: {
@@ -226,6 +228,9 @@ export const useMainStore = defineStore('main', {
     },
     setAIZMpageVisibleState(show: boolean) {
       this.AIZMpageVisible = show
+    },
+    setVideoTaskListState(show: boolean) {
+      this.showVideoTaskList = show
     },
   },
 })

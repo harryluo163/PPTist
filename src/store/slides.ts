@@ -62,7 +62,8 @@ export const useSlidesStore = defineStore('slides', {
       { name: '蓝色通用', id: 'template_2', cover: '/img/template_2.jpg' },
       { name: '紫色通用', id: 'template_3', cover: '/img/template_3.jpg' },
       { name: '莫兰迪配色', id: 'template_4', cover: '/img/template_4.jpg' },
-
+      { name: 'HK_01', id: 'template_hk_1', cover: '/img/template_hk_1.png' },
+      { name: 'HK_02', id: 'template_hk_2', cover: '/img/template_hk_2.png' },
 
     ], // 模板
   }),

@@ -22,6 +22,7 @@ export const useMP4Store = defineStore('MP4', {
     videoZM:true,
     bkmusic:'bgm3',
     aiLoading: false,
+    enableCharacter: false, // 数字人开关，默认开启
 
   }),
   actions: {
@@ -83,6 +84,9 @@ export const useMP4Store = defineStore('MP4', {
     randomizeModel() {
       const randomIndex = Math.floor(Math.random() * ACOUSTICS.length);
       this.model = ACOUSTICS[randomIndex].value;
+    },
+    setEnableCharacter(enable: boolean) {
+      this.enableCharacter = enable;
     },
   }
 })

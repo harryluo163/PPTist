@@ -13,6 +13,7 @@
 import { onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useScreenStore, useMainStore, useSnapshotStore, useSlidesStore } from '@/store'
+import { useMP4Store } from '@/store/mp4'
 import { LOCALSTORAGE_KEY_DISCARDED_DB } from '@/configs/storage'
 import { deleteDiscardedDB } from '@/utils/database'
 import { isPC } from '@/utils/common'
@@ -28,6 +29,7 @@ const _isPC = isPC()
 const mainStore = useMainStore()
 const slidesStore = useSlidesStore()
 const snapshotStore = useSnapshotStore()
+const mp4Store = useMP4Store()
 const { databaseId } = storeToRefs(mainStore)
 const { slides } = storeToRefs(slidesStore)
 const { screening } = storeToRefs(useScreenStore())
@@ -42,6 +44,9 @@ onMounted(async () => {
 
   await deleteDiscardedDB()
   snapshotStore.initSnapshotDatabase()
+  
+  // 初始化语音模型，随机选择音色
+  mp4Store.init()
 })
 
 // 应用注销时向 localStorage 中记录下本次 indexedDB 的数据库ID，用于之后清除数据库

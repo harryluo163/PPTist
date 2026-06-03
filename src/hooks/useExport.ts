@@ -9,6 +9,7 @@ import { useSlidesStore } from '@/store'
 import type { PPTElementOutline, PPTElementShadow, PPTElementLink, Slide } from '@/types/slides'
 import { getElementRange, getLineElementPath, getTableSubThemeColor } from '@/utils/element'
 import { type AST, toAST } from '@/utils/htmlParser'
+import { getUserId } from '@/utils/user'
 import { type SvgPoints, toPoints } from '@/utils/svgPathParser'
 import { encrypt } from '@/utils/crypto'
 import { svg2Base64 } from '@/utils/svg2Base64'
@@ -25,6 +26,56 @@ interface UploadResult {
   text: string;
   timestamp: number;
 }
+
+// Convert local images to base64 to avoid CORS and accessibility issues
+const convertLocalImagesToBase64 = async (element: HTMLElement): Promise<void> => {
+  const images = element.querySelectorAll('img');
+
+  const convertImage = async (img: HTMLImageElement): Promise<void> => {
+    return new Promise((resolve) => {
+      // Check if image is already a data URL or blob URL (already processed)
+      if (img.src.startsWith('data:') || img.src.startsWith('blob:')) {
+        resolve();
+        return;
+      }
+
+      // Check if image is from local development server or relative path
+      const isLocalImage = img.src.includes('127.0.0.1') ||
+                          img.src.includes('localhost') ||
+                          img.src.startsWith(window.location.origin) ||
+                          (!img.src.startsWith('http') && !img.src.startsWith('data:'));
+
+      if (isLocalImage) {
+        // Only try conversion if image is already loaded successfully
+        if (img.complete && img.naturalWidth > 0) {
+          try {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            canvas.width = img.naturalWidth;
+            canvas.height = img.naturalHeight;
+
+            // This will throw if CORS restricted
+            ctx?.drawImage(img, 0, 0);
+            const dataURL = canvas.toDataURL('image/png');
+            img.src = dataURL;
+            console.log('Successfully converted image to base64');
+          } catch (error) {
+            console.warn('Image conversion failed due to CORS, using transparent placeholder:', error);
+            img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+          }
+        } else {
+          // Image not loaded yet, use transparent placeholder
+          console.warn('Image not loaded, using transparent placeholder:', img.src);
+          img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+        }
+      }
+      resolve();
+    });
+  };
+
+  await Promise.all(Array.from(images).map(convertImage));
+};
 interface ExportImageConfig {
   quality: number
   width: number
@@ -57,6 +108,9 @@ export default () => {
 
   const API_URL = (import.meta.env.MODE === 'development') ? 'http://127.0.0.1:5000' : 'https://chatbi-video.centaline.com.cn'
   const uploadImage = async (domRef: HTMLElement, format: string, quality: number, ignoreWebfont = true, timestamp = Date.now()): Promise<UploadResult[]> => {
+    // Convert local images to base64 first to avoid CORS and accessibility issues
+    // await convertLocalImagesToBase64(domRef);
+
     const images = domRef.querySelectorAll('img');
     const imagePromises = Array.from(images).map(img => {
       // Skip already loaded images
@@ -487,15 +541,19 @@ export default () => {
     const PROGRESS_THROTTLE = 0.05 // 5%更新阈值
 
     try {
+      const userId = getUserId()
       const response = await fetch(`${API_URL}/convertVideo`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           timestamp:timestamp,
+          userId: userId,
           videoFormat: mp4Store.videoFormat,
           videoSy: mp4Store.videoSy,
           videoZM: mp4Store.videoZM,
           bkmusic: mp4Store.bkmusic,
+          enable_character: mp4Store.enableCharacter,
+          async: true,
         }),
         signal: controller.signal,
       })
@@ -715,6 +773,9 @@ export default () => {
   ): Promise<void> => {
     exporting.value = true;
     const toImage = format === 'png' ? toPng : toJpeg;
+
+    // Convert local images to base64 first to avoid CORS and accessibility issues
+    await convertLocalImagesToBase64(domRef);
 
     // 1. 移除 foreignObject 的 xmlns 属性（避免 SVG 渲染问题）
     const foreignObjectSpans = domRef.querySelectorAll('foreignObject [xmlns]');
@@ -1619,6 +1680,56 @@ export default () => {
     }, 200)
   }
 
+  // 提交视频异步任务
+  const convertVideoAsync = async (data: {
+    timestamp: string
+    userId: string
+    videoFormat?: string
+    videoSy?: string
+    videoZM?: string
+    bkmusic?: string
+  }) => {
+    return axios.post(`${API_URL}/convertVideoAsync`, data)
+  }
+
+  // 原视频接口（支持异步开关）
+  const convertVideoWithAsync = async (data: {
+    timestamp: string
+    userId: string
+    videoFormat?: string
+    videoSy?: string
+    videoZM?: string
+    bkmusic?: string
+    async?: boolean
+  }) => {
+    return axios.post(`${API_URL}/convertVideo`, data)
+  }
+
+  // 获取任务列表
+  const getTasks = async (params: {
+    userId: string
+    status?: string
+    limit?: number
+    offset?: number
+  }) => {
+    return axios.get(`${API_URL}/tasks`, { params })
+  }
+
+  // 获取单个任务详情
+  const getTaskDetail = async (taskId: string, userId?: string) => {
+    return axios.get(`${API_URL}/tasks/${taskId}`, { params: userId ? { userId } : {} })
+  }
+
+  // 删除单个任务
+  const deleteTask = async (taskId: string) => {
+    return axios.delete(`${API_URL}/tasks/${taskId}`)
+  }
+
+  // 重试失败的任务
+  const retryTask = async (taskId: string) => {
+    return axios.post(`${API_URL}/tasks/${taskId}/retry`)
+  }
+
   return {
     exporting,
     exportImage,
@@ -1629,6 +1740,12 @@ export default () => {
     exportZM,
     exportZMv2,
     convertAISlidesToText,
-    convertSlidesToAISlides
+    convertSlidesToAISlides,
+    convertVideoAsync,
+    convertVideoWithAsync,
+    getTasks,
+    getTaskDetail,
+    deleteTask,
+    retryTask
   }
 }
