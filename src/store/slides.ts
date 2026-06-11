@@ -47,20 +47,25 @@ export const useSlidesStore = defineStore('slides', {
         color: '#525252',
         style: 'solid',
       },
-    }, // 主题样式
+    }, // 主题样式、
     slides: [], // 幻灯片页面数据
     slideIndex: 0, // 当前页面索引
     viewportSize: 1000, // 可视区域宽度基数
     viewportRatio: 0.5625, // 可视区域比例，默认16:9
     templates: [
-      { name: '山河映红', id: 'template_1', cover: './imgs/template_1.webp', origin: '官方制作' },
-      { name: '都市蓝调', id: 'template_2', cover: './imgs/template_2.webp', origin: '官方制作' },
-      { name: '智感几何', id: 'template_3', cover: './imgs/template_3.webp', origin: '官方制作' },
-      { name: '柔光莫兰迪', id: 'template_4', cover: './imgs/template_4.webp', origin: '官方制作' },
-      { name: '简约绿意', id: 'template_5', cover: './imgs/template_5.webp', origin: '社区贡献+官方深度完善优化' },
-      { name: '暖色复古', id: 'template_6', cover: './imgs/template_6.webp', origin: '社区贡献+官方深度完善优化' },
-      { name: '深邃沉稳', id: 'template_7', cover: './imgs/template_7.webp', origin: '社区贡献+官方深度完善优化' },
-      { name: '浅蓝小清新', id: 'template_8', cover: './imgs/template_8.webp', origin: '社区贡献+官方深度完善优化' },
+      { name: '16:9中原集团', id: 'template_5', cover: '/img/template_5.png' },
+      { name: '中原红', id: 'template_1', cover: '/img/template_1.png' },
+      { name: '中原红2', id: 'template_6', cover: '/img/template_6.png' },
+      { name: '中原红3', id: 'template_7', cover: '/img/template_7.png' },
+      { name: '蓝色通用', id: 'template_2', cover: '/img/template_2.jpg' },
+      { name: '紫色通用', id: 'template_3', cover: '/img/template_3.jpg' },
+      { name: '莫兰迪配色', id: 'template_4', cover: '/img/template_4.jpg' },
+      { name: 'HK_01', id: 'template_hk_1', cover: '/img/template_hk_1.png' },
+      { name: 'HK_02', id: 'template_hk_2', cover: '/img/template_hk_2.png' },
+      { name: 'HK_03', id: 'template_hk_3', cover: '/img/template_hk_3.png' },
+      { name: 'HK_04', id: 'template_hk_4', cover: '/img/template_hk_4.png' },
+      { name: 'HK_05', id: 'template_hk_5', cover: '/img/template_hk_5.png' },
+      { name: 'HK_科技感', id: 'template_hk_div_1', cover: '/img/template_hk_div_1.png' },
     ], // 模板
   }),
 
@@ -150,7 +155,9 @@ export const useSlidesStore = defineStore('slides', {
     },
   
     updateSlide(props: Partial<Slide>, slideId?: string) {
+      if (!Array.isArray(this.slides)) return
       const slideIndex = slideId ? this.slides.findIndex(item => item.id === slideId) : this.slideIndex
+      if (slideIndex < 0 || slideIndex >= this.slides.length) return
       this.slides[slideIndex] = { ...this.slides[slideIndex], ...props }
     },
   

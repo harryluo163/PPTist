@@ -5,6 +5,7 @@ import Icons from 'unplugin-icons/vite'
 import { FileSystemIconLoader } from 'unplugin-icons/loaders'
 import IconsResolver from 'unplugin-icons/resolver'
 import Components from 'unplugin-vue-components/vite'
+import viteCompression from 'vite-plugin-compression'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -22,20 +23,26 @@ export default defineConfig({
     }),
     Icons({
       compiler: 'vue3',
-      autoInstall: false, 
+      autoInstall: false,
       customCollections: {
         custom: FileSystemIconLoader('src/assets/icons'),
       },
       scale: 1,
       defaultClass: 'i-icon',
     }),
+    viteCompression({
+      algorithm: 'gzip',
+      ext: '.gz',
+      threshold: 10240,
+      deleteOriginFile: false
+    })
   ],
   server: {
     host: '127.0.0.1',
     port: 5173,
     proxy: {
       '/api': {
-        target: 'https://server.pptist.cn',
+        target: 'http://127.0.0.1:3000/aippt_data',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       }
@@ -54,6 +61,22 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
+    }
+  },
+  // 新增以下配置以支持调试
+  build: {
+    minify: true, // 保持压缩（可选，如果不需要压缩可设为false）
+    sourcemap: false, // 生成source map文件
+    cssMinify: true, // 压缩CSS（可选）
+    rollupOptions: {
+      output: {
+        // 保留模块间的函数名（对调试有帮助）
+        preserveModules: false,
+        // 可选：手动控制sourcemap生成
+        sourcemap: true,
+        // 可选：为特定文件生成sourcemap
+        // sourcemapExcludeSources: false
+      }
     }
   }
 })

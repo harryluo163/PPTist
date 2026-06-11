@@ -1,10 +1,10 @@
 <template>
   <div class="export-dialog">
-    <Tabs 
-      :tabs="tabs" 
-      :value="dialogForExport" 
+    <Tabs
+      :tabs="tabs"
+      :value="dialogForExport"
       card
-      @update:value="key => setDialogForExport(key as DialogForExportTypes)" 
+      @update:value="key => setDialogForExport(key as DialogForExportTypes)"
     />
     <div class="content">
       <component :is="currentDialogComponent" @close="setDialogForExport('')"></component>
@@ -23,6 +23,9 @@ import ExportJSON from './ExportJSON.vue'
 import ExportPDF from './ExportPDF.vue'
 import ExportPPTX from './ExportPPTX.vue'
 import ExportSpecificFile from './ExportSpecificFile.vue'
+import ExportMP4 from './ExportMP4.vue'
+
+
 import Tabs from '@/components/Tabs.vue'
 
 interface TabItem {
@@ -41,6 +44,8 @@ const tabs: TabItem[] = [
   { key: 'image', label: '导出图片' },
   { key: 'json', label: '导出 JSON' },
   { key: 'pdf', label: '打印 / 导出 PDF' },
+
+  { key: 'mp4', label: '导出 视频' },
 ]
 
 const currentDialogComponent = computed<unknown>(() => {
@@ -50,6 +55,7 @@ const currentDialogComponent = computed<unknown>(() => {
     'pdf': ExportPDF,
     'pptx': ExportPPTX,
     'pptist': ExportSpecificFile,
+    'mp4': ExportMP4,
   }
   if (dialogForExport.value) return dialogMap[dialogForExport.value] || null
   return null
@@ -61,7 +67,7 @@ const currentDialogComponent = computed<unknown>(() => {
   margin: -20px;
 }
 .content {
-  height: 460px;
+  height: 500px;
   padding: 12px;
   font-size: 13px;
 

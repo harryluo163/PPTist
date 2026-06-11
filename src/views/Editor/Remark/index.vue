@@ -1,6 +1,6 @@
 <template>
   <div class="remark">
-    <div 
+    <div
       class="resize-handler"
       @mousedown="$event => resize($event)"
     ></div>
@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, useTemplateRef, watch } from 'vue'
+import {computed, nextTick, ref, useTemplateRef, watch} from 'vue'
 import { storeToRefs } from 'pinia'
 import { useSlidesStore } from '@/store'
 
@@ -30,7 +30,8 @@ const emit = defineEmits<{
 const slidesStore = useSlidesStore()
 const { currentSlide } = storeToRefs(slidesStore)
 
-const editorRef = useTemplateRef<InstanceType<typeof Editor>>('editorRef')
+
+const editorRef = ref<InstanceType<typeof Editor>>()
 watch(() => currentSlide.value.id, () => {
   nextTick(() => {
     editorRef.value!.updateTextContent()
@@ -41,7 +42,9 @@ watch(() => currentSlide.value.id, () => {
 
 const remark = computed(() => currentSlide.value?.remark || '')
 
+
 const handleInput = (content: string) => {
+    console.log('Updating remark:', content) // 调试用
   slidesStore.updateSlide({ remark: content })
 }
 

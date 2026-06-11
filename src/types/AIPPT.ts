@@ -27,8 +27,10 @@ export interface AIPPTContent {
   data: {
     title: string
     items: {
-      title: string
-      text: string
+      title?: string
+      text?: string
+      type?: 'title' | 'itemFigure'
+      src?: string  // 图片URL
     }[]
   },
   offset?: number

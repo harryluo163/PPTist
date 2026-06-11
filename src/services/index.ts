@@ -2,7 +2,8 @@ import axios from './axios'
 import fetchRequest from './fetch'
 
 // export const SERVER_URL = 'http://localhost:5000'
-export const SERVER_URL = (import.meta.env.MODE === 'development') ? '/api' : 'https://server.pptist.cn'
+export const SERVER_URL = (import.meta.env.MODE === 'development') ? '/api' : '/aippt_data'
+export const ASSET_URL = 'https://asset.pptist.cn'
 
 interface ImageSearchPayload {
   query: string;
@@ -19,6 +20,7 @@ interface AIPPTOutlinePayload {
   content: string
   language: string
   model: string
+  pageRange?: string
 }
 
 interface AIPPTPayload {
@@ -26,6 +28,8 @@ interface AIPPTPayload {
   language: string
   style: string
   model: string
+  originalInput?: string
+  pageRange?: string
 }
 
 interface AIWritingPayload {
@@ -42,10 +46,15 @@ export default {
     return axios.post(`${SERVER_URL}/tools/img_search`, body)
   },
 
+  getFileData(filename: string): Promise<any> {
+    return axios.get(`./mocks/${filename}.json`)
+  },
+
   AIPPT_Outline({
     content,
     language,
     model,
+    pageRange,
   }: AIPPTOutlinePayload): Promise<any> {
     return fetchRequest(`${SERVER_URL}/tools/aippt_outline`, {
       method: 'POST',
@@ -54,6 +63,7 @@ export default {
         language,
         model,
         stream: true,
+        ...(pageRange ? { pageRange } : {}),
       }),
     })
   },
@@ -63,6 +73,8 @@ export default {
     language,
     style,
     model,
+    originalInput,
+    pageRange,
   }: AIPPTPayload): Promise<any> {
     return fetchRequest(`${SERVER_URL}/tools/aippt`, {
       method: 'POST',
@@ -72,6 +84,8 @@ export default {
         model,
         style,
         stream: true,
+        ...(originalInput ? { originalInput } : {}),
+        ...(pageRange ? { pageRange } : {}),
       }),
     })
   },

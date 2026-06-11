@@ -12,6 +12,7 @@ import { onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { nanoid } from 'nanoid'
 import { useScreenStore, useMainStore, useSnapshotStore, useSlidesStore } from '@/store'
+import { useMP4Store } from '@/store/mp4'
 import { LOCALSTORAGE_KEY_DISCARDED_DB } from '@/configs/storage'
 import { deleteDiscardedDB } from '@/utils/database'
 import { isPC } from '@/utils/common'
@@ -28,6 +29,7 @@ const mainStore = useMainStore()
 const slidesStore = useSlidesStore()
 const snapshotStore = useSnapshotStore()
 const screenStore = useScreenStore()
+const mp4Store = useMP4Store()
 const { databaseId } = storeToRefs(mainStore)
 const { slides } = storeToRefs(slidesStore)
 const { screening } = storeToRefs(screenStore)
@@ -52,6 +54,8 @@ onMounted(async () => {
 
     await deleteDiscardedDB()
     snapshotStore.initSnapshotDatabase()
+
+    mp4Store.init()
   }
 })
 
