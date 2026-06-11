@@ -64,6 +64,10 @@ export const useSlidesStore = defineStore('slides', {
       { name: '莫兰迪配色', id: 'template_4', cover: '/img/template_4.jpg' },
       { name: 'HK_01', id: 'template_hk_1', cover: '/img/template_hk_1.png' },
       { name: 'HK_02', id: 'template_hk_2', cover: '/img/template_hk_2.png' },
+      { name: 'HK_03', id: 'template_hk_3', cover: '/img/template_hk_3.png' },
+      { name: 'HK_04', id: 'template_hk_4', cover: '/img/template_hk_4.png' },
+      { name: 'HK_05', id: 'template_hk_5', cover: '/img/template_hk_5.png' },
+      { name: 'HK_科技感', id: 'template_hk_div_1', cover: '/img/template_hk_div_1.png' },
 
     ], // 模板
   }),
@@ -153,7 +157,9 @@ export const useSlidesStore = defineStore('slides', {
     },
   
     updateSlide(props: Partial<Slide>, slideId?: string) {
+      if (!Array.isArray(this.slides)) return
       const slideIndex = slideId ? this.slides.findIndex(item => item.id === slideId) : this.slideIndex
+      if (slideIndex < 0 || slideIndex >= this.slides.length) return
       this.slides[slideIndex] = { ...this.slides[slideIndex], ...props }
     },
   

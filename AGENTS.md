@@ -45,6 +45,8 @@ npm run dev
 npm run build
 ```
 
+生产构建会自动执行 TypeScript 类型检查（`vue-tsc --build --force`），然后执行 Vite 构建。
+
 ### 预览生产构建
 
 ```bash
@@ -167,6 +169,7 @@ interface PPTBaseElement {
 - 全局样式变量定义在 `src/assets/styles/variable.scss`
 - 全局混入定义在 `src/assets/styles/mixin.scss`
 - 组件样式使用 `scoped` 属性
+- SCSS 全局变量和混入在 `vite.config.ts` 中自动导入，无需在每个组件中手动导入
 
 ### 组件开发
 
@@ -229,7 +232,7 @@ npm install
 # 启动开发服务器
 npm run dev
 
-# 构建生产版本
+# 构建生产版本（包含类型检查）
 npm run build
 
 # 预览生产构建
@@ -248,3 +251,8 @@ npm run type-check
 - 不提供开箱即用的在线服务
 - 移动端功能相对简化
 - 部分功能（如 AI PPT）需要后端支持
+- 使用 `@/` 路径别名访问 `src/` 目录下的文件
+- ESLint 配置文件 `.eslintrc.cjs` 当前为空，lint 命令可能无法正常工作
+- TypeScript 类型检查存在一些错误，主要与未完成的 MP4 导出和 AI PPT 功能相关
+- 项目使用 `npm-run-all2` 的 `run-p` 命令并行执行构建任务
+- 开发服务器配置了 API 代理，需要后端服务运行在 `http://127.0.0.1:3000/aippt_data`

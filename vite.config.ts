@@ -43,9 +43,9 @@ export default defineConfig({
   },
   // 新增以下配置以支持调试
   build: {
-    minify: false, // 保持压缩（可选，如果不需要压缩可设为false）
-    sourcemap: true, // 生成source map文件
-    cssMinify: false, // 压缩CSS（可选）
+    minify: true, // 保持压缩（可选，如果不需要压缩可设为false）
+    sourcemap: false, // 生成source map文件
+    cssMinify: true, // 压缩CSS（可选）
     rollupOptions: {
       output: {
         // 保留模块间的函数名（对调试有帮助）
