@@ -17,6 +17,7 @@ declare module 'vue' {
     'ICustom:filePptist': typeof import('~icons/custom/file-pptist')['default']
     'ICustom:left': typeof import('~icons/custom/left')['default']
     'ICustom:right': typeof import('~icons/custom/right')['default']
+    'IIconParkOutline:acoustic': typeof import('~icons/icon-park-outline/acoustic')['default']
     'IIconParkOutline:add': typeof import('~icons/icon-park-outline/add')['default']
     'IIconParkOutline:addText': typeof import('~icons/icon-park-outline/add-text')['default']
     'IIconParkOutline:alignBottom': typeof import('~icons/icon-park-outline/align-bottom')['default']

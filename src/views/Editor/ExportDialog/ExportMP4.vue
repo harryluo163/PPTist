@@ -37,7 +37,7 @@
                     <div class="title">音&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp色：</div>
                     <span class="config-item">{{ videoModel }}</span>
                     <div class="icon-text-container"  @click="toggleSelectAcousticPanel()">
-                        <IconAcoustic style="color: #009688" class="handler-item"  v-tooltip="'选择音色'" />
+                        <i-icon-park-outline:acoustic style="color: #009688" class="handler-item"  v-tooltip="'选择音色'" />
 
                     </div>
                 </div>
