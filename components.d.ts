@@ -120,6 +120,7 @@ declare module 'vue' {
     'IIconParkOutline:screenshotOne': typeof import('~icons/icon-park-outline/screenshot-one')['default']
     'IIconParkOutline:search': typeof import('~icons/icon-park-outline/search')['default']
     'IIconParkOutline:selected': typeof import('~icons/icon-park-outline/selected')['default']
+    'IIconParkOutline:send': typeof import('~icons/icon-park-outline/send')['default']
     'IIconParkOutline:sendToBack': typeof import('~icons/icon-park-outline/send-to-back')['default']
     'IIconParkOutline:sentToBack': typeof import('~icons/icon-park-outline/sent-to-back')['default']
     'IIconParkOutline:SentToBack': typeof import('~icons/icon-park-outline/sent-to-back')['default']
